@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.storage.CacheResetOnProcessCanceled.enabled
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -6,6 +8,7 @@ plugins {
 android {
     namespace = "com.example.playlistmaker"
     compileSdk = 34
+
 
     defaultConfig {
         applicationId = "com.example.playlistmaker"
