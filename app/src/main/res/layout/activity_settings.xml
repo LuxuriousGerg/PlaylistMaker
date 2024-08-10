@@ -7,30 +7,46 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <ImageView
-        android:id="@+id/icon_back"
-        android:layout_width="45dp"
-        android:layout_height="35dp"
-        android:src="@drawable/arrow"
-        app:iconTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="@+id/textView_title"
+   <FrameLayout
+        android:id="@+id/back_button_container"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="2dp"
+        app:layout_constraintBottom_toBottomOf="@id/title_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0">
 
-    <TextView
-        android:id="@+id/textView_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/settings_title"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/textView_theme"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@id/icon_back"
-        app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:id="@+id/icon_back"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:src="@drawable/arrow"
+            app:tint="@color/black" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/title_container"
+        android:layout_width="@dimen/container_width"
+        android:layout_height="@dimen/container_height"
+        android:layout_marginStart="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/back_button_container"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <TextView
+            android:id="@+id/textView_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/text_margin_start"
+            android:text="@string/settings_title"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_large"
+            android:textStyle="bold" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/textView_theme"
@@ -38,11 +54,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="@string/dark_theme"
-        android:textSize="18sp"
+        android:textSize="@dimen/text_size_normal"
         android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/switch_theme"
-        app:layout_constraintTop_toBottomOf="@id/textView_title" />
+        app:layout_constraintTop_toBottomOf="@id/title_container" />
 
     <Switch
         android:id="@+id/switch_theme"
@@ -52,7 +68,7 @@
         android:minWidth="56dp"
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView_title"
+        app:layout_constraintTop_toBottomOf="@id/title_container"
         tools:ignore="UseSwitchCompatOrMaterialXml" />
 
     <TextView
@@ -61,7 +77,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="@string/share_app"
-        android:textSize="18sp"
+        android:textSize="@dimen/text_size_normal"
         android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/icon_share"
@@ -82,7 +98,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="@string/contact_support"
-        android:textSize="18sp"
+        android:textSize="@dimen/text_size_normal"
         android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/icon_support"
@@ -103,7 +119,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="@string/terms_of_use"
-        android:textSize="18sp"
+        android:textSize="@dimen/text_size_normal"
         android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/icon_terms"
@@ -120,3 +136,4 @@
         app:layout_constraintTop_toBottomOf="@id/textView_support" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

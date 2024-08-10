@@ -12,10 +12,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/app_name"
-        android:textSize="24sp"
+        android:textSize="@dimen/text_size_title"
         android:textColor="@color/white"
         android:gravity="left"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="@dimen/padding_large"/>
 
 
     <Button
@@ -27,28 +27,28 @@
         android:drawableStart="@drawable/lupa"
         android:text="@string/search"
         android:textColor="@color/black"
-        android:textSize="18sp"
-        app:cornerRadius="8dp"
+        android:textSize="@dimen/text_size_button"
+        app:cornerRadius="@dimen/button_corner_radius"
         app:icon="@drawable/lupa"
         app:iconGravity="textStart"
-        app:iconPadding="8dp"
+        app:iconPadding="@dimen/button_icon_padding"
         app:iconTint="@color/black" />
 
     <Button
         android:id="@+id/button_library"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
         android:layout_weight="1"
+        android:layout_marginTop="@dimen/button_margin_top"
         android:backgroundTint="@color/white"
         android:drawableStart="@drawable/music_xml"
         android:text="@string/library"
         android:textColor="@color/black"
-        android:textSize="18sp"
+        android:textSize="@dimen/text_size_button"
+        app:cornerRadius="@dimen/button_corner_radius"
         app:icon="@drawable/music_xml"
-        app:cornerRadius="8dp"
         app:iconGravity="textStart"
-        app:iconPadding="8dp"
+        app:iconPadding="@dimen/button_icon_padding"
         app:iconTint="@color/black" />
 
     <Button
@@ -57,15 +57,15 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:text="@string/settings"
-        android:textSize="18sp"
+        android:textSize="@dimen/text_size_button"
         android:drawableStart="@drawable/light_mode"
         app:icon="@drawable/light_mode"
         app:iconGravity="textStart"
-        app:iconPadding="8dp"
+        app:iconPadding="@dimen/button_icon_padding"
         app:iconTint="@color/black"
-        app:cornerRadius="8dp"
+        app:cornerRadius="@dimen/button_corner_radius"
         android:backgroundTint="@color/white"
         android:textColor="@color/black"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="@dimen/button_margin_top" />
 
 </LinearLayout>
