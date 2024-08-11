@@ -3,7 +3,7 @@
     <dimen name="text_size_large">25sp</dimen>
     <dimen name="text_size_medium">20sp</dimen>
     <dimen name="text_size_normal">18sp</dimen>
-    <dimen name="text_margin_start">10dp</dimen>
+    <dimen name="text_margin_start">12dp</dimen>
     <dimen name="container_width">208dp</dimen>
     <dimen name="container_height">48dp</dimen>
     <dimen name="padding_large">16dp</dimen>
