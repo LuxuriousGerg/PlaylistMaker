@@ -25,7 +25,8 @@
         app:iconGravity="textStart"
         app:icon="@drawable/lupa"
         app:iconPadding="@dimen/button_icon_padding"
-        app:iconTint="@color/black" />
+        app:iconTint="@color/black"
+        android:textAllCaps="false"/>
 
     <Button
         android:id="@+id/button_library"
@@ -37,7 +38,8 @@
         app:iconGravity="textStart"
         app:icon="@drawable/music_xml"
         app:iconPadding="@dimen/button_icon_padding"
-        app:iconTint="@color/black" />
+        app:iconTint="@color/black"
+        android:textAllCaps="false"/>
 
     <Button
         android:id="@+id/button_settings"
@@ -49,5 +51,6 @@
         app:icon="@drawable/light_mode"
         app:iconGravity="textStart"
         app:iconPadding="@dimen/button_icon_padding"
-        app:iconTint="@color/black" />
+        app:iconTint="@color/black"
+        android:textAllCaps="false"/>
 </LinearLayout>

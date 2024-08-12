@@ -30,7 +30,7 @@
         android:id="@+id/title_container"
         android:layout_width="@dimen/container_width"
         android:layout_height="@dimen/container_height"
-        android:layout_marginStart="4dp"
+        android:layout_marginStart="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/back_button_container"
         app:layout_constraintTop_toTopOf="parent"
@@ -49,96 +49,126 @@
             android:textStyle="bold" />
     </FrameLayout>
 
-    <TextView
-        android:id="@+id/textView_theme"
+    <FrameLayout
+        android:id="@+id/theme_container"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:text="@string/dark_theme"
-        android:textSize="@dimen/text_size_medium"
-        android:textColor="@color/black"
+        android:layout_height="61dp"
+        android:layout_marginTop="80dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/switch_theme"
-        app:layout_constraintTop_toBottomOf="@id/title_container"
-        android:fontFamily="@font/ys_display_regular"/>
-
-    <Switch
-        android:id="@+id/switch_theme"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:minWidth="56dp"
-        android:minHeight="50dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title_container"
-        tools:ignore="UseSwitchCompatOrMaterialXml" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/textView_share_app"
+        <TextView
+            android:id="@+id/textView_theme"
+            android:layout_width="227dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:fontFamily="@font/ys_display_regular"
+            android:text="@string/dark_theme"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_medium"
+            app:layout_constraintEnd_toStartOf="@id/switch_theme"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Switch
+            android:id="@+id/switch_theme"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="56dp"
+            android:minHeight="50dp"
+            android:layout_gravity="end|center_vertical"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/share_app_container"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="45dp"
-        android:text="@string/share_app"
-        android:textSize="@dimen/text_size_medium"
-        android:textColor="@color/black"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/icon_share"
-        app:layout_constraintTop_toBottomOf="@id/textView_theme"
-        android:fontFamily="@font/ys_display_regular"/>
-
-    <ImageView
-        android:id="@+id/icon_share"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="45dp"
-        android:src="@drawable/share"
+        android:layout_height="61dp"
+        android:layout_marginTop="4dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView_theme" />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/theme_container">
 
-    <TextView
-        android:id="@+id/textView_support"
+        <TextView
+            android:id="@+id/textView_share_app"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:fontFamily="@font/ys_display_regular"
+            android:text="@string/share_app"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_medium"
+            app:layout_constraintEnd_toStartOf="@id/icon_share"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
+            android:id="@+id/icon_share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:src="@drawable/share" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/support_container"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="45dp"
-        android:text="@string/contact_support"
-        android:textSize="@dimen/text_size_medium"
-        android:textColor="@color/black"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/icon_support"
-        app:layout_constraintTop_toBottomOf="@id/textView_share_app"
-        android:fontFamily="@font/ys_display_regular"/>
-
-    <ImageView
-        android:id="@+id/icon_support"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/call"
+        android:layout_height="61dp"
+        android:layout_marginTop="4dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView_share_app"
-        android:layout_marginTop="45dp" />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/share_app_container">
 
-    <TextView
-        android:id="@+id/textView_terms"
+        <TextView
+            android:id="@+id/textView_support"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:fontFamily="@font/ys_display_regular"
+            android:text="@string/contact_support"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_medium"
+            app:layout_constraintEnd_toStartOf="@id/icon_support"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
+            android:id="@+id/icon_support"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:src="@drawable/call" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/terms_container"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="45dp"
-        android:text="@string/terms_of_use"
-        android:textSize="@dimen/text_size_medium"
-        android:textColor="@color/black"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/icon_terms"
-        app:layout_constraintTop_toBottomOf="@id/textView_support"
-        android:fontFamily="@font/ys_display_regular"/>
-
-    <ImageView
-        android:id="@+id/icon_terms"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginTop="48dp"
-        android:layout_marginEnd="4dp"
-        android:src="@drawable/vector"
+        android:layout_height="61dp"
+        android:layout_marginTop="4dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView_support" />
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/support_container">
+
+        <TextView
+            android:id="@+id/textView_terms"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:fontFamily="@font/ys_display_regular"
+            android:text="@string/terms_of_use"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_medium"
+            app:layout_constraintEnd_toStartOf="@id/icon_terms"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
+            android:id="@+id/icon_terms"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="end|center_vertical"
+            android:src="@drawable/vector" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
