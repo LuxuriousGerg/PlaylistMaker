@@ -5,5 +5,12 @@
     <color name="gray">#BDBDBD</color>
     <color name="buttonBackground">#FFFFFF</color>
     <color name="buttonText">#000000</color>
+    <color name="buttonText2">#000000</color>
     <color name="primaryDarkColor">#3700B3</color>
+    <color name="arrow">#000000</color>
+    <color name="background">#FFFFFF</color>
+    <color name="text_color">#121212</color>
+    <color name="search_background">#F0F0F0</color>
+    <color name="search_hint_color">#A0A0A0</color>
 </resources>
+
