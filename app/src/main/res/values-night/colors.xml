@@ -6,4 +6,10 @@
     <color name="black">#000000</color>
     <color name="buttonBackground">#FFFFFF</color>
     <color name="buttonText">#000000</color>
+    <color name="buttonText2">#FFFFFF</color>
+    <color name="arrow">#FFFFFF</color>
+    <color name="background">#121212</color>
+    <color name="text_color">#FFFFFF</color>
+    <color name="search_background">#FFFFFF</color>
+    <color name="search_hint_color">#B0B0B0</color>
 </resources>
