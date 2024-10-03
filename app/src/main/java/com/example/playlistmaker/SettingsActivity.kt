@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.net.Uri
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import android.widget.ImageView
+import com.google.android.material.textview.MaterialTextView
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -13,29 +13,37 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        val backButton: ImageView = findViewById(R.id.icon_back)
-        backButton.setOnClickListener {
+        // Инициализация и установка MaterialToolbar как ActionBar
+        val toolbar: com.google.android.material.appbar.MaterialToolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+        // Установка заголовка
+        supportActionBar?.title = getString(R.string.settings_title)
+
+        // Обработка нажатия на кнопку "Назад"
+        toolbar.setNavigationOnClickListener {
             finish() // Закрытие текущего экрана
         }
 
-        // Инициализация кнопки "Поделиться"
-        val shareButton: ImageView = findViewById(R.id.icon_share)
-        shareButton.setOnClickListener {
+        // Обработка кнопки "Поделиться приложением"
+        val shareTextView: MaterialTextView = findViewById(R.id.textView_share_app)
+        shareTextView.setOnClickListener {
             shareApp()
         }
 
-        // Инициализация кнопки "Написать в поддержку"
-        val supportButton: ImageView = findViewById(R.id.icon_support)
-        supportButton.setOnClickListener {
+        // Обработка кнопки "Написать в поддержку"
+        val supportTextView: MaterialTextView = findViewById(R.id.textView_support)
+        supportTextView.setOnClickListener {
             writeToSupport()
         }
 
-        // Инициализация кнопки "Пользовательское соглашение"
-        val userAgreementButton: ImageView = findViewById(R.id.icon_terms)
-        userAgreementButton.setOnClickListener {
+        // Обработка кнопки "Пользовательское соглашение"
+        val termsTextView: MaterialTextView = findViewById(R.id.textView_terms)
+        termsTextView.setOnClickListener {
             openUserAgreement()
         }
     }
+
 
     // Метод для шаринга приложения
     private fun shareApp() {
