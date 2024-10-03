@@ -8,46 +8,41 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
+import com.google.android.material.appbar.MaterialToolbar
 
 class SearchActivity : AppCompatActivity() {
 
-    private lateinit var searchView: SearchView
     private lateinit var searchEditText: EditText
     private lateinit var clearButton: ImageView
+    private lateinit var searchIcon: ImageView
 
-    // Переменная для сохранения текста
     private var queryText: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        val backButton: ImageView = findViewById(R.id.icon_back)
-        searchView = findViewById(R.id.search_view)
-        searchEditText = searchView.findViewById(androidx.appcompat.R.id.search_src_text)
-        clearButton = searchView.findViewById(androidx.appcompat.R.id.search_close_btn)
+        // Инициализация Toolbar
+        val toolbar: MaterialToolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.title = getString(R.string.search_hint)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener { finish() }
 
-        // Инициализация подсказки (hint)
-        searchEditText.hint = getString(R.string.search_hint)
-        searchEditText.maxLines = 1
-        searchEditText.isSingleLine = true
+        // Инициализация компонентов
+        searchEditText = findViewById(R.id.search_edit_text)
+        clearButton = findViewById(R.id.clear_button)
+        searchIcon = findViewById(R.id.search_icon)  // Инициализация иконки поиска
 
-        searchView.setOnClickListener {
-            searchView.isIconified = false
-        }
-
-        // Кнопка "Назад"
-        backButton.setOnClickListener {
-            finish()
-        }
-
-        // Скрываем кнопку "Очистить запрос" по умолчанию
+        // Скрываем кнопку "Очистить" по умолчанию
         clearButton.visibility = View.GONE
 
-        // Восстанавливаем текст, если он есть
-        queryText?.let {
-            searchEditText.setText(it)
+        // Обработка клика по иконке поиска
+        searchIcon.setOnClickListener {
+            // Фокус на поле ввода и открытие клавиатуры
+            searchEditText.requestFocus()
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT)
         }
 
         // Обработка ввода текста
@@ -55,10 +50,9 @@ class SearchActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // Сохраняем текущий текст в переменную queryText
                 queryText = s?.toString()
 
-                // Показать кнопку "Очистить запрос", если есть текст
+                // Показать кнопку "Очистить", если текст не пуст
                 if (s.isNullOrEmpty()) {
                     clearButton.visibility = View.GONE
                 } else {
@@ -69,44 +63,25 @@ class SearchActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        // Обработка нажатия на кнопку "Очистить запрос"
+        // Обработка нажатия на кнопку "Очистить"
         clearButton.setOnClickListener {
             searchEditText.text.clear()
             hideKeyboard()
             clearButton.visibility = View.GONE
         }
-
-        // Обработка отправки текста при поиске
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                // Логика поиска при нажатии на "Поиск"
-                return false
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                // Логика обновления при изменении текста
-                return false
-            }
-        })
     }
 
-    // Сохраняем состояние активности
+    // Сохранение текста при изменении состояния
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        // Сохраняем текст в Bundle только если он не пуст
-        if (!queryText.isNullOrEmpty()) {
-            outState.putString("QUERY_TEXT", queryText)
-        }
+        outState.putString("query_text", queryText)
     }
 
-    // Восстанавливаем состояние активности
+    // Восстановление текста после изменения состояния
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        // Восстанавливаем текст из Bundle
-        queryText = savedInstanceState.getString("QUERY_TEXT")
-        queryText?.let {
-            searchEditText.setText(it)
-        }
+        queryText = savedInstanceState.getString("query_text")
+        searchEditText.setText(queryText)
     }
 
     // Метод для скрытия клавиатуры
@@ -115,4 +90,5 @@ class SearchActivity : AppCompatActivity() {
         imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
     }
 }
+
 
