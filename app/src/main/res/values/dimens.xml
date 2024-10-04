@@ -23,5 +23,6 @@
     <dimen name="container_height2">61dp</dimen>
     <dimen name="paddingHorizontal">16dp</dimen>
     <dimen name="paddingVertical">20dp</dimen>
-    <dimen name="container_search">60dp</dimen>
+    <dimen name="container_search">52dp</dimen>
+    <dimen name="margin_start">10dp</dimen>
 </resources>

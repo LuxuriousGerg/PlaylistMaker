@@ -14,7 +14,6 @@ class SearchActivity : AppCompatActivity() {
 
     private lateinit var searchEditText: EditText
     private lateinit var clearButton: ImageView
-    private lateinit var searchIcon: ImageView
 
     private var queryText: String? = null
 
@@ -32,18 +31,9 @@ class SearchActivity : AppCompatActivity() {
         // Инициализация компонентов
         searchEditText = findViewById(R.id.search_edit_text)
         clearButton = findViewById(R.id.clear_button)
-        searchIcon = findViewById(R.id.search_icon)  // Инициализация иконки поиска
 
         // Скрываем кнопку "Очистить" по умолчанию
         clearButton.visibility = View.GONE
-
-        // Обработка клика по иконке поиска
-        searchIcon.setOnClickListener {
-            // Фокус на поле ввода и открытие клавиатуры
-            searchEditText.requestFocus()
-            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT)
-        }
 
         // Обработка ввода текста
         searchEditText.addTextChangedListener(object : TextWatcher {
