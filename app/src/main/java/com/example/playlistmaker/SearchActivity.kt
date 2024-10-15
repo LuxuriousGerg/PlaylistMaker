@@ -8,17 +8,13 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 
 class SearchActivity : AppCompatActivity() {
 
     private lateinit var searchEditText: EditText
     private lateinit var clearButton: ImageView
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var trackAdapter: TrackAdapter
-
+    private lateinit var searchIcon: ImageView
 
     private var queryText: String? = null
 
@@ -36,18 +32,18 @@ class SearchActivity : AppCompatActivity() {
         // Инициализация компонентов
         searchEditText = findViewById(R.id.search_edit_text)
         clearButton = findViewById(R.id.clear_button)
-        recyclerView = findViewById(R.id.recycler_view)
-
-        // Инициализация RecyclerView
-        val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-
-        // Привязка адаптера к RecyclerView
-        val adapter = TrackAdapter(trackList)
-        recyclerView.adapter = adapter
+        searchIcon = findViewById(R.id.search_icon)  // Инициализация иконки поиска
 
         // Скрываем кнопку "Очистить" по умолчанию
         clearButton.visibility = View.GONE
+
+        // Обработка клика по иконке поиска
+        searchIcon.setOnClickListener {
+            // Фокус на поле ввода и открытие клавиатуры
+            searchEditText.requestFocus()
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT)
+        }
 
         // Обработка ввода текста
         searchEditText.addTextChangedListener(object : TextWatcher {
@@ -93,7 +89,6 @@ class SearchActivity : AppCompatActivity() {
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
     }
-
 }
 
 
