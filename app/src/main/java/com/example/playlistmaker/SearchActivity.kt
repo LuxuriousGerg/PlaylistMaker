@@ -8,12 +8,17 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 
 class SearchActivity : AppCompatActivity() {
 
     private lateinit var searchEditText: EditText
     private lateinit var clearButton: ImageView
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var trackAdapter: TrackAdapter
+
 
     private var queryText: String? = null
 
@@ -31,6 +36,15 @@ class SearchActivity : AppCompatActivity() {
         // Инициализация компонентов
         searchEditText = findViewById(R.id.search_edit_text)
         clearButton = findViewById(R.id.clear_button)
+        recyclerView = findViewById(R.id.recycler_view)
+
+        // Инициализация RecyclerView
+        val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        // Привязка адаптера к RecyclerView
+        val adapter = TrackAdapter(trackList)
+        recyclerView.adapter = adapter
 
         // Скрываем кнопку "Очистить" по умолчанию
         clearButton.visibility = View.GONE
@@ -79,6 +93,7 @@ class SearchActivity : AppCompatActivity() {
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
     }
+
 }
 
 

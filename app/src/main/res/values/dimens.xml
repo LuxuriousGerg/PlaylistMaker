@@ -25,4 +25,5 @@
     <dimen name="paddingVertical">20dp</dimen>
     <dimen name="container_search">52dp</dimen>
     <dimen name="margin_start">10dp</dimen>
+    <dimen name="search_start">10dp</dimen>
 </resources>

@@ -21,38 +21,54 @@
         app:titleTextColor="@color/buttonText2" />
 
     <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="0dp"
         android:layout_height="@dimen/search_height"
         android:layout_marginStart="@dimen/margin_start_medium"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="@dimen/search_start"
         android:layout_marginEnd="@dimen/margin_start_medium"
         android:background="@drawable/search_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
-    <EditText
-        android:id="@+id/search_edit_text"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="10dp"
-        android:hint="@string/search_hint"
-        android:textColorHint="@color/gray"
-        android:padding="0dp"
-        android:background="@drawable/search_background"
-        android:singleLine="true"
-        android:drawableStart="@drawable/lupa_mini"
-        android:drawablePadding="10dp"
-        android:textCursorDrawable="@drawable/cursor_color"/>
+        <EditText
+            android:id="@+id/search_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/search_start"
+            android:background="@drawable/search_background"
+            android:drawableStart="@drawable/lupa_mini"
+            android:drawablePadding="@dimen/search_start"
+            android:hint="@string/search_hint"
+            android:padding="0dp"
+            android:singleLine="true"
+            android:textColorHint="@color/gray"
+            android:textCursorDrawable="@drawable/cursor_color" />
 
-    <ImageView
-        android:id="@+id/clear_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|center_vertical"
-        android:padding="8dp"
-        android:src="@drawable/clear"
-        android:visibility="gone" />
+        <ImageView
+            android:id="@+id/clear_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:padding="8dp"
+            android:src="@drawable/clear"
+            android:visibility="gone" />
     </FrameLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/button_margin_top"
+        android:layout_marginBottom="@dimen/button_margin_top"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/search_edit_text"
+        app:layout_constraintVertical_bias="1.0"
+        tools:listitem="@layout/item_track" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
