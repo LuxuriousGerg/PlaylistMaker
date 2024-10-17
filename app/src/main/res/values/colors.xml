@@ -13,5 +13,7 @@
     <color name="search_background">#F0F0F0</color>
     <color name="search_hint_color">#A0A0A0</color>
     <color name="YP_blue">#1976D2</color>
+    <color name="hint_light">#000000</color>
+    <color name="text_light">#000000</color>
 </resources>
 

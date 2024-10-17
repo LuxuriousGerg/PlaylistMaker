@@ -7,6 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 
 class TrackAdapter(private val trackList: ArrayList<Track>) :
     RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
@@ -28,6 +30,7 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
         private val trackName: TextView = itemView.findViewById(R.id.track_name)
         private val artistAndTime: TextView = itemView.findViewById(R.id.artist_and_time)
         private val trackArtwork: ImageView = itemView.findViewById(R.id.album_cover)
+        private val imageUrl = "https://img.freepik.com/free-vector/open-blue-book-white_1308-69339.jpg"
 
         fun bind(track: Track) {
             trackName.text = track.trackName
@@ -36,8 +39,9 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
             // Загрузка обложки трека с помощью Glide
             Glide.with(itemView)
                 .load(track.artworkUrl100)
-                .fitCenter()
+                .apply(RequestOptions().transform(RoundedCorners(3)))
                 .placeholder(R.drawable.placeholder_image) // Плейсхолдер на случай отсутствия интернета
+                .error(R.drawable.placeholder_image)
                 .into(trackArtwork)
         }
     }
