@@ -41,9 +41,9 @@
         <item name="android:singleLine">true</item>
     </style>
 
-    <style name="RoundedImage">
+    <style name="RoundedImage" parent="ShapeAppearance.MaterialComponents.SmallComponent">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">20dp</item>
+        <item name="cornerSize">3dp</item>
     </style>
 
 </resources>
