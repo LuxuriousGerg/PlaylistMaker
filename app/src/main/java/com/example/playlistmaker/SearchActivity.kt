@@ -3,22 +3,31 @@ package com.example.playlistmaker
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.GET
+import retrofit2.http.Query
 
 class SearchActivity : AppCompatActivity() {
-
     private lateinit var searchEditText: EditText
     private lateinit var clearButton: ImageView
     private lateinit var recyclerView: RecyclerView
     private lateinit var trackAdapter: TrackAdapter
-
 
     private var queryText: String? = null
 
@@ -39,12 +48,11 @@ class SearchActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recycler_view)
 
         // Инициализация RecyclerView
-        val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Привязка адаптера к RecyclerView
-        val adapter = TrackAdapter(trackList)
-        recyclerView.adapter = adapter
+        // Привязка адаптера к RecyclerView с пустым списком
+        trackAdapter = TrackAdapter(arrayListOf())
+        recyclerView.adapter = trackAdapter
 
         // Скрываем кнопку "Очистить" по умолчанию
         clearButton.visibility = View.GONE
@@ -57,35 +65,132 @@ class SearchActivity : AppCompatActivity() {
                 queryText = s?.toString()
 
                 // Показать кнопку "Очистить", если текст не пуст
-                if (s.isNullOrEmpty()) {
-                    clearButton.visibility = View.GONE
-                } else {
-                    clearButton.visibility = View.VISIBLE
-                }
+                clearButton.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
+
+        // Обработка нажатия на кнопку "Done" на клавиатуре
+        searchEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                queryText?.let { performSearch(it) } // Проверка на пустой текст
+                hideKeyboard()
+                true
+            } else {
+                false
+            }
+        }
 
         // Обработка нажатия на кнопку "Очистить"
         clearButton.setOnClickListener {
             searchEditText.text.clear()
             hideKeyboard()
             clearButton.visibility = View.GONE
+            trackAdapter.updateTracks(emptyList()) // Очистка списка треков
+            recyclerView.visibility = View.GONE // Скрытие RecyclerView
+        }
+
+        setupRetryButton() // Вызов для инициализации кнопки "Повторить"
+
+        // Восстановление состояния из savedInstanceState
+        savedInstanceState?.let {
+            queryText = it.getString("query_text")
+            searchEditText.setText(queryText)
+            if (!queryText.isNullOrEmpty()) {
+                performSearch(queryText!!)
+            }
         }
     }
 
-    // Сохранение текста при изменении состояния
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString("query_text", queryText)
+    // Выполнение поиска по запросу
+    private fun performSearch(query: String) {
+        if (query.isNotEmpty()) {
+            Log.d("SearchActivity", "Выполняется поиск для: $query")
+
+            // Локальная инициализация Retrofit
+            val retrofit = Retrofit.Builder()
+                .baseUrl("https://itunes.apple.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            val api = retrofit.create(iTunesApiService::class.java)
+            api.searchTracks(query).enqueue(object : Callback<SearchResponse> {
+                override fun onResponse(call: Call<SearchResponse>, response: Response<SearchResponse>) {
+                    Log.d("SearchActivity", "Ответ от API: ${response.code()}")
+
+                    if (response.isSuccessful) {
+                        val searchResponse = response.body()
+                        val tracks = searchResponse?.results ?: emptyList()
+
+                        Log.d("SearchActivity", "Найдено треков: ${tracks.size}")
+
+                        if (tracks.isEmpty()) {
+                            showError("no_results") // Показываем ошибку, если нет результатов
+                        } else {
+                            trackAdapter.updateTracks(tracks) // Обновляем адаптер
+                            recyclerView.visibility = View.VISIBLE // Показываем RecyclerView при наличии данных
+                            hideError() // Скрываем ошибку, если есть данные
+                        }
+                    } else {
+                        Log.e("SearchActivity", "Ошибка запроса: ${response.code()}")
+                        showError("connection")
+                    }
+                }
+
+                override fun onFailure(call: Call<SearchResponse>, t: Throwable) {
+                    Log.e("SearchActivity", "Ошибка сети: ${t.message}")
+                    showError("connection")
+                }
+            })
+        }
     }
 
-    // Восстановление текста после изменения состояния
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        queryText = savedInstanceState.getString("query_text")
-        searchEditText.setText(queryText)
+    // Метод для отображения ошибок
+    private fun showError(errorType: String) {
+        val errorIcon: ImageView = findViewById(R.id.error_icon)
+        val errorText: TextView = findViewById(R.id.error_text)
+        val errorIcon2: ImageView = findViewById(R.id.error_icon2)
+        val errorText2: TextView = findViewById(R.id.error_text2)
+        val retryButton: Button = findViewById(R.id.retry_button)
+
+        when (errorType) {
+            "connection" -> {
+                errorIcon.setImageResource(R.drawable.error2)
+                errorText.text = getString(R.string.connection_error_text)
+                errorIcon.visibility = View.VISIBLE
+                errorText.visibility = View.VISIBLE
+                retryButton.visibility = View.VISIBLE
+                errorIcon2.visibility = View.GONE
+                errorText2.visibility = View.GONE
+            }
+            "no_results" -> {
+                errorIcon2.setImageResource(R.drawable.error)
+                errorText2.text = getString(R.string.no_results_text)
+                errorIcon2.visibility = View.VISIBLE
+                errorText2.visibility = View.VISIBLE
+                retryButton.visibility = View.GONE
+                errorIcon.visibility = View.GONE
+                errorText.visibility = View.GONE
+            }
+        }
+
+        recyclerView.visibility = View.GONE // Скрываем RecyclerView
+    }
+
+    private fun hideError() {
+        findViewById<ImageView>(R.id.error_icon).visibility = View.GONE
+        findViewById<TextView>(R.id.error_text).visibility = View.GONE
+        findViewById<ImageView>(R.id.error_icon2).visibility = View.GONE
+        findViewById<TextView>(R.id.error_text2).visibility = View.GONE
+    }
+
+    // Обработка нажатия на кнопку "Повторить" для перезапуска поиска
+    private fun setupRetryButton() {
+        val retryButton: Button = findViewById(R.id.retry_button)
+        retryButton.setOnClickListener {
+            queryText?.let { performSearch(it) } // Повторный поиск
+        }
     }
 
     // Метод для скрытия клавиатуры
@@ -94,6 +199,19 @@ class SearchActivity : AppCompatActivity() {
         imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
     }
 
+    // Сохранение текста при изменении состояния
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("query_text", queryText)
+    }
+
+    // Интерфейс для iTunes API
+    interface iTunesApiService {
+        @GET("search")
+        fun searchTracks(@Query("term") searchText: String): Call<SearchResponse>
+    }
 }
+
+
 
 
