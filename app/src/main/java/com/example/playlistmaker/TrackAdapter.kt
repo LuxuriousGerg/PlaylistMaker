@@ -26,15 +26,21 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
 
     override fun getItemCount() = trackList.size
 
+    // Метод для обновления данных треков
+    fun updateTracks(newTracks: List<Track>) {
+        trackList.clear()
+        trackList.addAll(newTracks)
+        notifyDataSetChanged()
+    }
+
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val trackName: TextView = itemView.findViewById(R.id.track_name)
         private val artistAndTime: TextView = itemView.findViewById(R.id.artist_and_time)
         private val trackArtwork: ImageView = itemView.findViewById(R.id.album_cover)
-        private val imageUrl = "https://img.freepik.com/free-vector/open-blue-book-white_1308-69339.jpg"
 
         fun bind(track: Track) {
             trackName.text = track.trackName
-            artistAndTime.text = "${track.artistName} • ${track.trackTime}"
+            artistAndTime.text = "${track.artistName} • ${formatTrackTime(track.trackTimeMillis)}"
 
             // Загрузка обложки трека с помощью Glide
             Glide.with(itemView)

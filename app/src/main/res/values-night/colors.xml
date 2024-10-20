@@ -12,4 +12,5 @@
     <color name="text_color">#FFFFFF</color>
     <color name="search_background">#FFFFFF</color>
     <color name="search_hint_color">#B0B0B0</color>
+    <color name="button_color">#FFFFFF</color>
 </resources>
