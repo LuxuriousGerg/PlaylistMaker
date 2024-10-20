@@ -54,6 +54,13 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="clearHistoryButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:background">@drawable/rounded_button_background</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:textColor">@color/background</item>
+        <item name="android:textSize">14sp</item>
+    </style>
 
 </resources>
 
