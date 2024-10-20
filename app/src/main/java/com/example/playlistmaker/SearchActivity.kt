@@ -28,6 +28,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var clearButton: ImageView
     private lateinit var recyclerView: RecyclerView
     private lateinit var trackAdapter: TrackAdapter
+    private lateinit var retryButton: Button // Добавляем кнопку "Повторить"
 
     private var queryText: String? = null
 
@@ -46,6 +47,7 @@ class SearchActivity : AppCompatActivity() {
         searchEditText = findViewById(R.id.search_edit_text)
         clearButton = findViewById(R.id.clear_button)
         recyclerView = findViewById(R.id.recycler_view)
+        retryButton = findViewById(R.id.retry_button) // Инициализация кнопки "Повторить"
 
         // Инициализация RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -66,6 +68,11 @@ class SearchActivity : AppCompatActivity() {
 
                 // Показать кнопку "Очистить", если текст не пуст
                 clearButton.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+
+                // Если текст очищается, сбрасываем UI
+                if (s.isNullOrEmpty()) {
+                    resetSearchUI() // Сброс интерфейса
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -85,10 +92,7 @@ class SearchActivity : AppCompatActivity() {
         // Обработка нажатия на кнопку "Очистить"
         clearButton.setOnClickListener {
             searchEditText.text.clear()
-            hideKeyboard()
-            clearButton.visibility = View.GONE
-            trackAdapter.updateTracks(emptyList()) // Очистка списка треков
-            recyclerView.visibility = View.GONE // Скрытие RecyclerView
+            resetSearchUI() // Используем метод сброса интерфейса
         }
 
         setupRetryButton() // Вызов для инициализации кнопки "Повторить"
@@ -131,6 +135,8 @@ class SearchActivity : AppCompatActivity() {
                             trackAdapter.updateTracks(tracks) // Обновляем адаптер
                             recyclerView.visibility = View.VISIBLE // Показываем RecyclerView при наличии данных
                             hideError() // Скрываем ошибку, если есть данные
+
+                            retryButton.visibility = View.GONE // Скрываем кнопку "Повторить" после успешного запроса
                         }
                     } else {
                         Log.e("SearchActivity", "Ошибка запроса: ${response.code()}")
@@ -152,7 +158,6 @@ class SearchActivity : AppCompatActivity() {
         val errorText: TextView = findViewById(R.id.error_text)
         val errorIcon2: ImageView = findViewById(R.id.error_icon2)
         val errorText2: TextView = findViewById(R.id.error_text2)
-        val retryButton: Button = findViewById(R.id.retry_button)
 
         when (errorType) {
             "connection" -> {
@@ -187,7 +192,6 @@ class SearchActivity : AppCompatActivity() {
 
     // Обработка нажатия на кнопку "Повторить" для перезапуска поиска
     private fun setupRetryButton() {
-        val retryButton: Button = findViewById(R.id.retry_button)
         retryButton.setOnClickListener {
             queryText?.let { performSearch(it) } // Повторный поиск
         }
@@ -197,6 +201,19 @@ class SearchActivity : AppCompatActivity() {
     private fun hideKeyboard() {
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
+    }
+
+    // Сброс интерфейса при очистке запроса
+    private fun resetSearchUI() {
+        searchEditText.clearFocus()
+
+        // Скрыть все placeholder'ы
+        findViewById<View>(R.id.error_icon)?.visibility = View.GONE
+        findViewById<View>(R.id.error_text)?.visibility = View.GONE
+        findViewById<View>(R.id.retry_button)?.visibility = View.GONE
+        findViewById<View>(R.id.error_icon2)?.visibility = View.GONE
+        findViewById<View>(R.id.error_text2)?.visibility = View.GONE
+        recyclerView.visibility = View.GONE
     }
 
     // Сохранение текста при изменении состояния

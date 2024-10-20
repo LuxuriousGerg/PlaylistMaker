@@ -104,7 +104,7 @@
         tools:layout_editor_absoluteY="360dp"
         android:visibility="gone"/>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/retry_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -115,6 +115,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         style="@style/RoundedButton"
         android:backgroundTint="@color/button_color"
+        android:fontFamily="@font/ys_display_medium"
         android:visibility="gone"/>
 
     <ImageView
