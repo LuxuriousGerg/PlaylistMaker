@@ -250,7 +250,12 @@ class SearchActivity : AppCompatActivity() {
         findViewById<View>(R.id.retry_button)?.visibility = View.GONE
         findViewById<View>(R.id.error_icon2)?.visibility = View.GONE
         findViewById<View>(R.id.error_text2)?.visibility = View.GONE
-        recyclerView.visibility = View.GONE
+
+        // Загрузить историю поиска, если поле поиска пустое
+        loadSearchHistory()
+
+        // Показываем RecyclerView только если есть история поиска
+        recyclerView.visibility = if (searchHistory.getHistory().isNotEmpty()) View.VISIBLE else View.GONE
     }
 
     // Сохранение текста при изменении состояния

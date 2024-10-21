@@ -1,5 +1,6 @@
 package com.example.playlistmaker
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +27,7 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
         holder.bind(track)
 
         holder.itemView.setOnClickListener {
+            Log.d("TrackClick", "Track clicked: ${track.trackName}, Artist: ${track.artistName}, Duration: ${formatTrackTime(track.trackTimeMillis)}, Artwork: ${track.artworkUrl100}")
             onTrackClickListener?.invoke(track)
         }
     }

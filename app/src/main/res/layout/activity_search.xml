@@ -43,7 +43,7 @@
             android:hint="@string/search_hint"
             android:padding="0dp"
             android:singleLine="true"
-            android:textColorHint="@color/gray"
+            android:textColorHint="@color/search"
             android:textColor="@color/text_light"
             android:textCursorDrawable="@drawable/cursor_color"
             android:importantForAccessibility="yes" />
@@ -55,6 +55,7 @@
             android:layout_gravity="end|center_vertical"
             android:padding="8dp"
             android:src="@drawable/clear"
+            android:textColor="@color/text_light"
             android:visibility="gone" />
     </FrameLayout>
 
