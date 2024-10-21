@@ -1,8 +1,5 @@
 package com.example.playlistmaker
 
-import java.text.SimpleDateFormat
-import java.util.Locale
-
 data class Track(
     val trackName: String, // Название композиции
     val artistName: String, // Имя исполнителя
@@ -16,6 +13,14 @@ data class SearchResponse(
 )
 
 fun formatTrackTime(trackTimeMillis: Long): String {
-    val seconds = trackTimeMillis / 1000
-    return SimpleDateFormat("mm:ss", Locale.getDefault()).format(seconds * 1000)
+    val totalSeconds = trackTimeMillis / 1000
+    val hours = totalSeconds / 3600
+    val minutes = (totalSeconds % 3600) / 60
+    val seconds = totalSeconds % 60
+
+    return if (hours > 0) {
+        String.format("%d:%02d:%02d", hours, minutes, seconds)
+    } else {
+        String.format("%02d:%02d", minutes, seconds)
+    }
 }

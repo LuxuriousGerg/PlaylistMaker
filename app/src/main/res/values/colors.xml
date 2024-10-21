@@ -16,5 +16,6 @@
     <color name="hint_light">#000000</color>
     <color name="text_light">#000000</color>
     <color name="button_color">#000000</color>
+    <color name="search">#A0A0A0</color>
 </resources>
 

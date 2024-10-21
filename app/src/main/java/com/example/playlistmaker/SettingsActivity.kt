@@ -6,6 +6,10 @@ import android.net.Uri
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.textview.MaterialTextView
+import android.app.Application
+import androidx.appcompat.app.AppCompatDelegate
+import android.content.SharedPreferences
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -41,6 +45,14 @@ class SettingsActivity : AppCompatActivity() {
         val termsTextView: MaterialTextView = findViewById(R.id.textView_terms)
         termsTextView.setOnClickListener {
             openUserAgreement()
+        }
+
+        // Инициализация переключателя темы
+        val themeSwitcher: SwitchMaterial = findViewById(R.id.switch_theme)
+        themeSwitcher.isChecked = (applicationContext as App).darkTheme
+
+        themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
+            (applicationContext as App).switchTheme(isChecked)
         }
     }
 
@@ -92,6 +104,33 @@ class SettingsActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+}
+class App : Application() {
+
+    var darkTheme = false
+    private lateinit var preferences: SharedPreferences
+
+    override fun onCreate() {
+        super.onCreate()
+
+        preferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+        darkTheme = preferences.getBoolean("dark_theme", false)
+
+        switchTheme(darkTheme)
+    }
+
+    fun switchTheme(darkThemeEnabled: Boolean) {
+        darkTheme = darkThemeEnabled
+        preferences.edit().putBoolean("dark_theme", darkThemeEnabled).apply()
+
+        AppCompatDelegate.setDefaultNightMode(
+            if (darkThemeEnabled) {
+                AppCompatDelegate.MODE_NIGHT_YES
+            } else {
+                AppCompatDelegate.MODE_NIGHT_NO
+            }
+        )
     }
 }
 
