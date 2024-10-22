@@ -13,7 +13,7 @@
         <item name="android:layout_weight">1</item>
         <item name="android:backgroundTint">@color/buttonBackground</item>
         <item name="android:textColor">@color/buttonText</item>
-        <item name="android:textSize">@dimen/text_size_button</item>
+        <item name="android:textSize">@dimen/text_size_button_big</item>
 
     </style>
 </resources>

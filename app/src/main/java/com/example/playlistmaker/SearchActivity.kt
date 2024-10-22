@@ -155,6 +155,10 @@ class SearchActivity : AppCompatActivity() {
 
                         Log.d("SearchActivity", "Найдено треков: ${tracks.size}")
 
+                        tracks.forEach { track ->
+                            Log.d("SearchActivity", "Трек: ${track.trackName}, Длина: ${track.trackTimeMillis}")
+                        }
+
                         if (tracks.isEmpty()) {
                             showError("no_results") // Показываем ошибку, если нет результатов
                         } else {

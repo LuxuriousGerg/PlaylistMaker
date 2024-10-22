@@ -35,8 +35,24 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
     override fun getItemCount() = trackList.size
 
     fun updateTracks(newTracks: List<Track>) {
+        // Фильтруем треки с пустым названием или временем, равным нулю
+        val filteredTracks = newTracks.filter { track ->
+            // Добавляем проверку на null
+            val isTrackNameValid = track.trackName?.isNotEmpty() == true
+            val isTrackTimeValid = track.trackTimeMillis > 0
+
+            if (!isTrackNameValid) {
+                Log.e("TrackAdapter", "Track name is null or empty for track: $track")
+            }
+            if (!isTrackTimeValid) {
+                Log.e("TrackAdapter", "Track time is zero or negative for track: $track")
+            }
+
+            isTrackNameValid && isTrackTimeValid
+        }
+
         trackList.clear()
-        trackList.addAll(newTracks)
+        trackList.addAll(filteredTracks)
         notifyDataSetChanged()
     }
 
@@ -50,8 +66,9 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
         private val trackArtwork: ImageView = itemView.findViewById(R.id.album_cover)
 
         fun bind(track: Track) {
-            trackName.text = track.trackName
-            artistAndTime.text = "${track.artistName} • ${formatTrackTime(track.trackTimeMillis)}"
+            // Проверка на null перед присвоением значений
+            trackName.text = track.trackName ?: "Неизвестный трек"
+            artistAndTime.text = "${track.artistName ?: "Неизвестный артист"} • ${formatTrackTime(track.trackTimeMillis)}"
 
             // Загрузка обложки трека с помощью Glide
             Glide.with(itemView)
@@ -60,6 +77,10 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
                 .placeholder(R.drawable.placeholder_image) // Плейсхолдер на случай отсутствия интернета
                 .error(R.drawable.placeholder_image)
                 .into(trackArtwork)
+
+            // Устанавливаем фокус на текстовые поля для включения marquee
+            trackName.isSelected = true
+            artistAndTime.isSelected = true
         }
     }
 }
