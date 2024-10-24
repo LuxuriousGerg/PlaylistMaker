@@ -34,22 +34,19 @@ android:padding="0dp">
         android:id="@+id/textView_share_app"
         style="@style/SettingsButtonStyle"
         android:text="@string/share_app"
-        android:drawableEnd="@drawable/share"
-     />
+        android:drawableEnd="@drawable/share" />
 
-<com.google.android.material.textview.MaterialTextView
-    android:id="@+id/textView_support"
-    style="@style/SettingsButtonStyle"
-    android:text="@string/contact_support"
-    android:drawableEnd="@drawable/call"
-    />
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/textView_support"
+        style="@style/SettingsButtonStyle"
+        android:text="@string/contact_support"
+        android:drawableEnd="@drawable/call" />
 
-<com.google.android.material.textview.MaterialTextView
-    android:id="@+id/textView_terms"
-    style="@style/SettingsButtonStyle"
-    android:text="@string/terms_of_use"
-    android:drawableEnd="@drawable/vector"
-     />
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/textView_terms"
+        style="@style/SettingsButtonStyle"
+        android:text="@string/terms_of_use"
+        android:drawableEnd="@drawable/vector" />
 
 </LinearLayout>
 

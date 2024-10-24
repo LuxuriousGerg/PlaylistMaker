@@ -28,7 +28,9 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var clearButton: ImageView
     private lateinit var recyclerView: RecyclerView
     private lateinit var trackAdapter: TrackAdapter
-    private lateinit var retryButton: Button // Добавляем кнопку "Повторить"
+    private lateinit var retryButton: Button
+    private lateinit var clearHistoryButton: Button
+    private lateinit var searchHistory: SearchHistory
 
     private var queryText: String? = null
 
@@ -47,17 +49,32 @@ class SearchActivity : AppCompatActivity() {
         searchEditText = findViewById(R.id.search_edit_text)
         clearButton = findViewById(R.id.clear_button)
         recyclerView = findViewById(R.id.recycler_view)
-        retryButton = findViewById(R.id.retry_button) // Инициализация кнопки "Повторить"
+        retryButton = findViewById(R.id.retry_button)
+        clearHistoryButton = findViewById(R.id.clearHistoryButton)
+
+        // Инициализация SharedPreferences и SearchHistory
+        val sharedPreferences = getSharedPreferences("my_prefs", MODE_PRIVATE)
+        searchHistory = SearchHistory(sharedPreferences)
 
         // Инициализация RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(this)
+        trackAdapter = TrackAdapter(arrayListOf())
+        recyclerView.adapter = trackAdapter
 
         // Привязка адаптера к RecyclerView с пустым списком
         trackAdapter = TrackAdapter(arrayListOf())
         recyclerView.adapter = trackAdapter
+        trackAdapter = TrackAdapter(arrayListOf())
+        trackAdapter.setOnTrackClickListener { track ->
+            searchHistory.addTrack(track)
+        }
+        recyclerView.adapter = trackAdapter
 
         // Скрываем кнопку "Очистить" по умолчанию
         clearButton.visibility = View.GONE
+
+        // Загружаем историю поиска при старте
+        loadSearchHistory()
 
         // Обработка ввода текста
         searchEditText.addTextChangedListener(object : TextWatcher {
@@ -72,9 +89,13 @@ class SearchActivity : AppCompatActivity() {
                 // Если текст очищается, сбрасываем UI
                 if (s.isNullOrEmpty()) {
                     resetSearchUI() // Сброс интерфейса
+                } else {
+                    // Скрываем заголовок истории и кнопку очистки, когда пользователь что-то вводит
+                    val searchHistoryTitle: TextView = findViewById(R.id.searchHistoryTitle)
+                    searchHistoryTitle.visibility = View.GONE
+                    clearHistoryButton.visibility = View.GONE
                 }
             }
-
             override fun afterTextChanged(s: Editable?) {}
         })
 
@@ -92,10 +113,15 @@ class SearchActivity : AppCompatActivity() {
         // Обработка нажатия на кнопку "Очистить"
         clearButton.setOnClickListener {
             searchEditText.text.clear()
-            resetSearchUI() // Используем метод сброса интерфейса
+            resetSearchUI()
         }
 
-        setupRetryButton() // Вызов для инициализации кнопки "Повторить"
+        clearHistoryButton.setOnClickListener {
+            searchHistory.clearHistory() // Очищаем историю
+            loadSearchHistory()
+        }
+
+        setupRetryButton()
 
         // Восстановление состояния из savedInstanceState
         savedInstanceState?.let {
@@ -129,6 +155,10 @@ class SearchActivity : AppCompatActivity() {
 
                         Log.d("SearchActivity", "Найдено треков: ${tracks.size}")
 
+                        tracks.forEach { track ->
+                            Log.d("SearchActivity", "Трек: ${track.trackName}, Длина: ${track.trackTimeMillis}")
+                        }
+
                         if (tracks.isEmpty()) {
                             showError("no_results") // Показываем ошибку, если нет результатов
                         } else {
@@ -150,6 +180,17 @@ class SearchActivity : AppCompatActivity() {
                 }
             })
         }
+    }
+
+    // Метод для загрузки истории поиска
+    private fun loadSearchHistory() {
+        val history = searchHistory.getHistory()
+        trackAdapter.updateTracks(history)
+
+        // Показать/скрыть элементы UI, такие как заголовок и кнопка очистки
+        val searchHistoryTitle: TextView = findViewById(R.id.searchHistoryTitle)
+        searchHistoryTitle.visibility = if (history.isNotEmpty()) View.VISIBLE else View.GONE
+        clearHistoryButton.visibility = if (history.isNotEmpty()) View.VISIBLE else View.GONE
     }
 
     // Метод для отображения ошибок
@@ -180,7 +221,7 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        recyclerView.visibility = View.GONE // Скрываем RecyclerView
+        recyclerView.visibility = View.GONE
     }
 
     private fun hideError() {
@@ -193,7 +234,7 @@ class SearchActivity : AppCompatActivity() {
     // Обработка нажатия на кнопку "Повторить" для перезапуска поиска
     private fun setupRetryButton() {
         retryButton.setOnClickListener {
-            queryText?.let { performSearch(it) } // Повторный поиск
+            queryText?.let { performSearch(it) }
         }
     }
 
@@ -213,7 +254,12 @@ class SearchActivity : AppCompatActivity() {
         findViewById<View>(R.id.retry_button)?.visibility = View.GONE
         findViewById<View>(R.id.error_icon2)?.visibility = View.GONE
         findViewById<View>(R.id.error_text2)?.visibility = View.GONE
-        recyclerView.visibility = View.GONE
+
+        // Загрузить историю поиска, если поле поиска пустое
+        loadSearchHistory()
+
+        // Показываем RecyclerView только если есть история поиска
+        recyclerView.visibility = if (searchHistory.getHistory().isNotEmpty()) View.VISIBLE else View.GONE
     }
 
     // Сохранение текста при изменении состояния

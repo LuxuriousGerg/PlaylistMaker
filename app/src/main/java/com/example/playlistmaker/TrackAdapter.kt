@@ -1,5 +1,6 @@
 package com.example.playlistmaker
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,8 @@ import com.bumptech.glide.request.RequestOptions
 class TrackAdapter(private val trackList: ArrayList<Track>) :
     RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
+    private var onTrackClickListener: ((Track) -> Unit)? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         val itemView = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_track, parent, false)
@@ -22,15 +25,39 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         val track = trackList[position]
         holder.bind(track)
+
+        holder.itemView.setOnClickListener {
+            Log.d("TrackClick", "Track clicked: ${track.trackName}, Artist: ${track.artistName}, Duration: ${formatTrackTime(track.trackTimeMillis)}, Artwork: ${track.artworkUrl100}")
+            onTrackClickListener?.invoke(track)
+        }
     }
 
     override fun getItemCount() = trackList.size
 
-    // Метод для обновления данных треков
     fun updateTracks(newTracks: List<Track>) {
+        // Фильтруем треки с пустым названием или временем, равным нулю
+        val filteredTracks = newTracks.filter { track ->
+            // Добавляем проверку на null
+            val isTrackNameValid = track.trackName?.isNotEmpty() == true
+            val isTrackTimeValid = track.trackTimeMillis > 0
+
+            if (!isTrackNameValid) {
+                Log.e("TrackAdapter", "Track name is null or empty for track: $track")
+            }
+            if (!isTrackTimeValid) {
+                Log.e("TrackAdapter", "Track time is zero or negative for track: $track")
+            }
+
+            isTrackNameValid && isTrackTimeValid
+        }
+
         trackList.clear()
-        trackList.addAll(newTracks)
+        trackList.addAll(filteredTracks)
         notifyDataSetChanged()
+    }
+
+    fun setOnTrackClickListener(listener: (Track) -> Unit) {
+        onTrackClickListener = listener
     }
 
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -39,8 +66,9 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
         private val trackArtwork: ImageView = itemView.findViewById(R.id.album_cover)
 
         fun bind(track: Track) {
-            trackName.text = track.trackName
-            artistAndTime.text = "${track.artistName} • ${formatTrackTime(track.trackTimeMillis)}"
+            // Проверка на null перед присвоением значений
+            trackName.text = track.trackName ?: "Неизвестный трек"
+            artistAndTime.text = "${track.artistName ?: "Неизвестный артист"} • ${formatTrackTime(track.trackTimeMillis)}"
 
             // Загрузка обложки трека с помощью Glide
             Glide.with(itemView)
@@ -49,6 +77,10 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
                 .placeholder(R.drawable.placeholder_image) // Плейсхолдер на случай отсутствия интернета
                 .error(R.drawable.placeholder_image)
                 .into(trackArtwork)
+
+            // Устанавливаем фокус на текстовые поля для включения marquee
+            trackName.isSelected = true
+            artistAndTime.isSelected = true
         }
     }
 }
