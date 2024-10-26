@@ -1,5 +1,6 @@
 package com.example.playlistmaker
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -64,9 +65,17 @@ class SearchActivity : AppCompatActivity() {
         // Привязка адаптера к RecyclerView с пустым списком
         trackAdapter = TrackAdapter(arrayListOf())
         recyclerView.adapter = trackAdapter
-        trackAdapter = TrackAdapter(arrayListOf())
+
+// Устанавливаем слушатель кликов
         trackAdapter.setOnTrackClickListener { track ->
+            // Добавляем трек в историю поиска
             searchHistory.addTrack(track)
+
+            // Переход на экран «Аудиоплеера»
+            val intent = Intent(this, PlayerActivity::class.java).apply {
+                putExtra("track", track) // Передаем трек
+            }
+            startActivity(intent)
         }
         recyclerView.adapter = trackAdapter
 
@@ -154,10 +163,6 @@ class SearchActivity : AppCompatActivity() {
                         val tracks = searchResponse?.results ?: emptyList()
 
                         Log.d("SearchActivity", "Найдено треков: ${tracks.size}")
-
-                        tracks.forEach { track ->
-                            Log.d("SearchActivity", "Трек: ${track.trackName}, Длина: ${track.trackTimeMillis}")
-                        }
 
                         if (tracks.isEmpty()) {
                             showError("no_results") // Показываем ошибку, если нет результатов

@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="PlayerActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="2dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageButton
+                android:id="@+id/back_button"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:src="@drawable/arrow"
+                app:tint="@color/arrow" />
+        </FrameLayout>
+
+        <!-- Обложка альбома -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/album_cover"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="84dp"
+            android:layout_marginEnd="24dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_image"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/RoundedImage" />
+
+        <!-- Название трека -->
+        <TextView
+            android:id="@+id/track_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="24dp"
+            android:text="Yesterday (Remastered 2009)"
+            android:textSize="24sp"
+            android:textColor="@color/text_color"
+            android:fontFamily="@font/ys_display_medium"
+            app:layout_constraintTop_toBottomOf="@id/album_cover"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Имя исполнителя -->
+        <TextView
+            android:id="@+id/artist_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:layout_marginStart="0dp"
+            android:text="The Beatles"
+            android:textSize="18sp"
+            android:textColor="@color/text_color"
+            android:fontFamily="@font/ys_text_medium"
+            app:layout_constraintTop_toBottomOf="@id/track_title"
+            app:layout_constraintStart_toStartOf="@id/track_title" />
+
+        <ImageView
+            android:id="@+id/play"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="115dp"
+            android:padding="8dp"
+            android:src="@drawable/play"
+            app:layout_constraintTop_toBottomOf="@id/album_cover"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+
+        <ImageView
+            android:id="@+id/add_button"
+            android:layout_width="51dp"
+            android:layout_height="51dp"
+            android:padding="8dp"
+            android:src="@drawable/add_button"
+            android:layout_marginTop="132dp"
+            app:layout_constraintTop_toBottomOf="@id/album_cover"
+            app:layout_constraintStart_toStartOf="@id/album_cover" />
+
+        <ImageView
+            android:id="@+id/like"
+            android:layout_width="51dp"
+            android:layout_height="51dp"
+            android:padding="8dp"
+            android:src="@drawable/like"
+            android:layout_marginTop="132dp"
+            app:layout_constraintTop_toBottomOf="@id/album_cover"
+            app:layout_constraintEnd_toEndOf="@id/album_cover" />
+
+        <!-- Время проигрывания под кнопкой -->
+        <TextView
+            android:id="@+id/current_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="0:00"
+            android:textColor="@color/text_color"
+            app:layout_constraintTop_toBottomOf="@id/play"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:gravity="center" />
+
+        <!-- Длительность -->
+        <TextView
+            android:id="@+id/info_duration_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:layout_marginStart="24dp"
+            android:text="Длительность"
+            android:textSize="13sp"
+            android:textColor="@color/search_hint_color"
+            app:layout_constraintTop_toBottomOf="@id/current_time"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/info_duration_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:text="5:35"
+            android:textSize="13sp"
+            android:textColor="@color/text_color"
+            app:layout_constraintTop_toTopOf="@id/info_duration_label"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Альбом -->
+        <TextView
+            android:id="@+id/info_album_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="17dp"
+            android:layout_marginStart="24dp"
+            android:text="Альбом"
+            android:textSize="13sp"
+            android:textColor="@color/search_hint_color"
+            app:layout_constraintTop_toBottomOf="@id/info_duration_label"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/info_album_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:text="Yesterday (Remastered 2009)"
+            android:textSize="13sp"
+            android:textColor="@color/text_color"
+            app:layout_constraintTop_toTopOf="@id/info_album_label"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Год -->
+        <TextView
+            android:id="@+id/info_year_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="17dp"
+            android:layout_marginStart="24dp"
+            android:text="Год"
+            android:textSize="13sp"
+            android:textColor="@color/search_hint_color"
+            app:layout_constraintTop_toBottomOf="@id/info_album_label"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/info_year_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:text="2009"
+            android:textSize="13sp"
+            android:textColor="@color/text_color"
+            app:layout_constraintTop_toTopOf="@id/info_year_label"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Жанр -->
+        <TextView
+            android:id="@+id/info_genre_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="17dp"
+            android:layout_marginStart="24dp"
+            android:text="Жанр"
+            android:textSize="13sp"
+            android:textColor="@color/search_hint_color"
+            app:layout_constraintTop_toBottomOf="@id/info_year_label"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/info_genre_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:text="Rock"
+            android:textSize="13sp"
+            android:textColor="@color/text_color"
+            app:layout_constraintTop_toTopOf="@id/info_genre_label"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Страна -->
+        <TextView
+            android:id="@+id/info_country_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="17dp"
+            android:layout_marginStart="24dp"
+            android:text="Страна"
+            android:textSize="13sp"
+            android:textColor="@color/search_hint_color"
+            app:layout_constraintTop_toBottomOf="@id/info_genre_label"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/info_country_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:text="USA"
+            android:textSize="13sp"
+            android:textColor="@color/text_color"
+            app:layout_constraintTop_toTopOf="@id/info_country_label"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

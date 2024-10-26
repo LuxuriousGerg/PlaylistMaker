@@ -72,9 +72,9 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
 
             // Загрузка обложки трека с помощью Glide
             Glide.with(itemView)
-                .load(track.artworkUrl100)
+                .load(track.getCoverArtwork())
                 .apply(RequestOptions().transform(RoundedCorners(3)))
-                .placeholder(R.drawable.placeholder_image) // Плейсхолдер на случай отсутствия интернета
+                .placeholder(R.drawable.placeholder_image)
                 .error(R.drawable.placeholder_image)
                 .into(trackArtwork)
 
