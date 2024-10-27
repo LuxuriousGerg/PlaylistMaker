@@ -18,4 +18,11 @@
     <string name="connection_error_text">Проблемы со связью. Загрузка не удалась. Проверьте подключение к интернету</string>
     <string name="clear_history">Очистить историю</string>
     <string name="search_history">Вы искали</string>
+    <string name="unknown_track">Неизвестный трек</string>
+    <string name="unknown_artist">Неизвестный исполнитель</string>
+    <string name="default_duration">00:00</string>
+    <string name="unknown_album">Неизвестный альбом</string>
+    <string name="default_year">-</string>
+    <string name="default_genre">-</string>
+    <string name="default_country">-</string>
 </resources>

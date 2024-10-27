@@ -6,8 +6,15 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 
-
 class PlayerActivity : AppCompatActivity() {
+
+    private lateinit var trackTitle: TextView
+    private lateinit var artistName: TextView
+    private lateinit var durationValue: TextView
+    private lateinit var albumValue: TextView
+    private lateinit var yearValue: TextView
+    private lateinit var genreValue: TextView
+    private lateinit var countryValue: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,38 +26,45 @@ class PlayerActivity : AppCompatActivity() {
             finish()
         }
 
-        // Получаем данные трека из интента
+        // Инициализация элементов
+        trackTitle = findViewById(R.id.track_title)
+        trackTitle.isSelected = true
+        artistName = findViewById(R.id.artist_name)
+        artistName.isSelected = true
+        durationValue = findViewById(R.id.info_duration_value)
+        albumValue = findViewById(R.id.info_album_value)
+        yearValue = findViewById(R.id.info_year_value)
+        genreValue = findViewById(R.id.info_genre_value)
+        countryValue = findViewById(R.id.info_country_value)
+
         val track = intent.getSerializableExtra("track") as? Track
 
         track?.let {
-            // Название трека и исполнитель
-            findViewById<TextView>(R.id.track_title).text = it.trackName
-            findViewById<TextView>(R.id.artist_name).text = it.artistName
-            findViewById<TextView>(R.id.info_duration_value).text = formatTrackTime(it.trackTimeMillis)
-            findViewById<TextView>(R.id.info_album_value).text = it.collectionName
-            findViewById<TextView>(R.id.info_year_value).text = it.getReleaseYear()
-            findViewById<TextView>(R.id.info_genre_value).text = it.primaryGenreName
-            findViewById<TextView>(R.id.info_country_value).text = it.country
+            trackTitle.text = it.trackName
+            artistName.text = it.artistName
+            durationValue.text = track.formatTrackTime(it.trackTimeMillis)
+            albumValue.text = it.collectionName
+            yearValue.text = it.getReleaseYear()
+            genreValue.text = it.primaryGenreName
+            countryValue.text = it.country
 
-            // Загрузка изображения обложки альбома
             Glide.with(this)
                 .load(it.getCoverArtwork())
                 .placeholder(R.drawable.placeholder_image)
                 .error(R.drawable.error)
                 .into(findViewById(R.id.album_cover))
         } ?: run {
-            // Обработка случая, если данные трека не были переданы
-            findViewById<TextView>(R.id.track_title).text = "Неизвестный трек"
-            findViewById<TextView>(R.id.artist_name).text = "Неизвестный исполнитель"
-            findViewById<TextView>(R.id.info_duration_value).text = "00:00"
-            findViewById<TextView>(R.id.info_album_value).text = "Неизвестный альбом"
-            findViewById<TextView>(R.id.info_year_value).text = "-"
-            findViewById<TextView>(R.id.info_genre_value).text = "-"
-            findViewById<TextView>(R.id.info_country_value).text = "-"
+            trackTitle.text = getString(R.string.unknown_track)
+            artistName.text = getString(R.string.unknown_artist)
+            durationValue.text = getString(R.string.default_duration)
+            albumValue.text = getString(R.string.unknown_album)
+            yearValue.text = getString(R.string.default_year)
+            genreValue.text = getString(R.string.default_genre)
+            countryValue.text = getString(R.string.default_country)
+
             Glide.with(this)
                 .load(R.drawable.placeholder_image)
                 .into(findViewById(R.id.album_cover))
         }
     }
 }
-
