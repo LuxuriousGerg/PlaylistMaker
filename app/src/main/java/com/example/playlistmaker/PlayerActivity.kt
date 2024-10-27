@@ -33,6 +33,7 @@ class PlayerActivity : AppCompatActivity() {
         artistName.isSelected = true
         durationValue = findViewById(R.id.info_duration_value)
         albumValue = findViewById(R.id.info_album_value)
+        albumValue.isSelected = true
         yearValue = findViewById(R.id.info_year_value)
         genreValue = findViewById(R.id.info_genre_value)
         countryValue = findViewById(R.id.info_country_value)

@@ -43,10 +43,12 @@
         <!-- Название трека -->
         <TextView
             android:id="@+id/track_title"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:paddingStart="0dp"
             android:text="Yesterday (Remastered 2009)"
             android:textSize="24sp"
             android:textColor="@color/text_color"
@@ -56,15 +58,18 @@
             android:scrollHorizontally="true"
             android:singleLine="true"
             app:layout_constraintTop_toBottomOf="@id/album_cover"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Имя исполнителя -->
         <TextView
             android:id="@+id/artist_name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
-            android:layout_marginStart="0dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:paddingStart="0dp"
             android:text="The Beatles"
             android:textSize="18sp"
             android:textColor="@color/text_color"
@@ -74,7 +79,9 @@
             android:scrollHorizontally="true"
             android:singleLine="true"
             app:layout_constraintTop_toBottomOf="@id/track_title"
-            app:layout_constraintStart_toStartOf="@id/track_title" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
 
         <ImageView
             android:id="@+id/play"
@@ -94,7 +101,8 @@
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:src="@drawable/add_button"
-            android:layout_marginTop="54dp"
+            app:layout_constraintTop_toTopOf="@id/play"
+            app:layout_constraintBottom_toBottomOf="@id/play"
             app:layout_constraintTop_toBottomOf="@id/artist_name"
             app:layout_constraintStart_toStartOf="@id/album_cover" />
 
@@ -104,7 +112,8 @@
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:src="@drawable/like"
-            android:layout_marginTop="54dp"
+            app:layout_constraintTop_toTopOf="@id/play"
+            app:layout_constraintBottom_toBottomOf="@id/play"
             app:layout_constraintTop_toBottomOf="@id/artist_name"
             app:layout_constraintEnd_toEndOf="@id/album_cover" />
 
@@ -160,11 +169,16 @@
 
         <TextView
             android:id="@+id/info_album_value"
-            android:layout_width="wrap_content"
+            android:layout_width="235dp"
             android:layout_height="wrap_content"
+            android:gravity="end"
             android:layout_marginEnd="16dp"
             android:text="Yesterday (Remastered 2009)"
             android:textSize="13sp"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
             android:textColor="@color/text_color"
             app:layout_constraintTop_toTopOf="@id/info_album_label"
             app:layout_constraintEnd_toEndOf="parent" />
