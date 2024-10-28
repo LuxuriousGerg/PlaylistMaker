@@ -27,7 +27,7 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
         holder.bind(track)
 
         holder.itemView.setOnClickListener {
-            Log.d("TrackClick", "Track clicked: ${track.trackName}, Artist: ${track.artistName}, Duration: ${formatTrackTime(track.trackTimeMillis)}, Artwork: ${track.artworkUrl100}")
+            Log.d("TrackClick", "Track clicked: ${track.trackName}, Artist: ${track.artistName}, Duration: ${track.formatTrackTime(track.trackTimeMillis)}, Artwork: ${track.artworkUrl100}")
             onTrackClickListener?.invoke(track)
         }
     }
@@ -68,13 +68,14 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
         fun bind(track: Track) {
             // Проверка на null перед присвоением значений
             trackName.text = track.trackName ?: "Неизвестный трек"
-            artistAndTime.text = "${track.artistName ?: "Неизвестный артист"} • ${formatTrackTime(track.trackTimeMillis)}"
+            artistAndTime.text = "${track.artistName ?: "Неизвестный артист"} • ${track.formatTrackTime(track.trackTimeMillis)}"
+
 
             // Загрузка обложки трека с помощью Glide
             Glide.with(itemView)
-                .load(track.artworkUrl100)
+                .load(track.getCoverArtwork())
                 .apply(RequestOptions().transform(RoundedCorners(3)))
-                .placeholder(R.drawable.placeholder_image) // Плейсхолдер на случай отсутствия интернета
+                .placeholder(R.drawable.placeholder_image)
                 .error(R.drawable.placeholder_image)
                 .into(trackArtwork)
 

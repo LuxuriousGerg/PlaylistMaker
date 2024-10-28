@@ -1,5 +1,6 @@
 package com.example.playlistmaker
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -64,9 +65,17 @@ class SearchActivity : AppCompatActivity() {
         // Привязка адаптера к RecyclerView с пустым списком
         trackAdapter = TrackAdapter(arrayListOf())
         recyclerView.adapter = trackAdapter
-        trackAdapter = TrackAdapter(arrayListOf())
+
+// Устанавливаем слушатель кликов
         trackAdapter.setOnTrackClickListener { track ->
+            // Добавляем трек в историю поиска
             searchHistory.addTrack(track)
+
+            // Переход на экран «Аудиоплеера»
+            val intent = Intent(this, PlayerActivity::class.java).apply {
+                putExtra("track", track) // Передаем трек
+            }
+            startActivity(intent)
         }
         recyclerView.adapter = trackAdapter
 
@@ -83,19 +92,15 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 queryText = s?.toString()
 
-                // Показать кнопку "Очистить", если текст не пуст
+                // Показать кнопку "Очистить" при наличии текста в строке поиска
                 clearButton.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
 
-                // Если текст очищается, сбрасываем UI
+                // Убираем скрытие заголовка и кнопки очистки истории отсюда
                 if (s.isNullOrEmpty()) {
-                    resetSearchUI() // Сброс интерфейса
-                } else {
-                    // Скрываем заголовок истории и кнопку очистки, когда пользователь что-то вводит
-                    val searchHistoryTitle: TextView = findViewById(R.id.searchHistoryTitle)
-                    searchHistoryTitle.visibility = View.GONE
-                    clearHistoryButton.visibility = View.GONE
+                    resetSearchUI() // Сброс интерфейса, если текст удален
                 }
             }
+
             override fun afterTextChanged(s: Editable?) {}
         })
 
@@ -138,6 +143,10 @@ class SearchActivity : AppCompatActivity() {
         if (query.isNotEmpty()) {
             Log.d("SearchActivity", "Выполняется поиск для: $query")
 
+            // Скрываем заголовок истории и кнопку очистки истории только при реальном поиске
+            findViewById<TextView>(R.id.searchHistoryTitle).visibility = View.GONE
+            clearHistoryButton.visibility = View.GONE
+
             // Локальная инициализация Retrofit
             val retrofit = Retrofit.Builder()
                 .baseUrl("https://itunes.apple.com/")
@@ -145,8 +154,8 @@ class SearchActivity : AppCompatActivity() {
                 .build()
 
             val api = retrofit.create(iTunesApiService::class.java)
-            api.searchTracks(query).enqueue(object : Callback<SearchResponse> {
-                override fun onResponse(call: Call<SearchResponse>, response: Response<SearchResponse>) {
+            api.searchTracks(query).enqueue(object : Callback<Track.SearchResponse> {
+                override fun onResponse(call: Call<Track.SearchResponse>, response: Response<Track.SearchResponse>) {
                     Log.d("SearchActivity", "Ответ от API: ${response.code()}")
 
                     if (response.isSuccessful) {
@@ -155,18 +164,14 @@ class SearchActivity : AppCompatActivity() {
 
                         Log.d("SearchActivity", "Найдено треков: ${tracks.size}")
 
-                        tracks.forEach { track ->
-                            Log.d("SearchActivity", "Трек: ${track.trackName}, Длина: ${track.trackTimeMillis}")
-                        }
-
                         if (tracks.isEmpty()) {
                             showError("no_results") // Показываем ошибку, если нет результатов
                         } else {
                             trackAdapter.updateTracks(tracks) // Обновляем адаптер
                             recyclerView.visibility = View.VISIBLE // Показываем RecyclerView при наличии данных
-                            hideError() // Скрываем ошибку, если есть данные
+                            hideError()
 
-                            retryButton.visibility = View.GONE // Скрываем кнопку "Повторить" после успешного запроса
+                            retryButton.visibility = View.GONE
                         }
                     } else {
                         Log.e("SearchActivity", "Ошибка запроса: ${response.code()}")
@@ -174,7 +179,7 @@ class SearchActivity : AppCompatActivity() {
                     }
                 }
 
-                override fun onFailure(call: Call<SearchResponse>, t: Throwable) {
+                override fun onFailure(call: Call<Track.SearchResponse>, t: Throwable) {
                     Log.e("SearchActivity", "Ошибка сети: ${t.message}")
                     showError("connection")
                 }
@@ -271,7 +276,7 @@ class SearchActivity : AppCompatActivity() {
     // Интерфейс для iTunes API
     interface iTunesApiService {
         @GET("search")
-        fun searchTracks(@Query("term") searchText: String): Call<SearchResponse>
+        fun searchTracks(@Query("term") searchText: String): Call<Track.SearchResponse>
     }
 }
 
