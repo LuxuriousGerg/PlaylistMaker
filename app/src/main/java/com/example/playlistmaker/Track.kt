@@ -10,7 +10,8 @@ data class Track(
     val collectionName: String, // Название альбома
     val releaseDate: String,    // Год выпуска
     val primaryGenreName: String, // Жанр
-    val country: String        // Страна
+    val country: String,        // Страна
+    val previewUrl: String?
 ) : Serializable {
 
     fun getReleaseYear(): String {
