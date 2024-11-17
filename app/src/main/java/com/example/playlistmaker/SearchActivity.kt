@@ -229,6 +229,7 @@ class SearchActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.error_text).visibility = View.GONE
         findViewById<ImageView>(R.id.error_icon2).visibility = View.GONE
         findViewById<TextView>(R.id.error_text2).visibility = View.GONE
+        retryButton.visibility = View.GONE
     }
 
     // Сброс интерфейса при очистке запроса
