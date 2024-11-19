@@ -18,11 +18,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
-import kotlinx.coroutines.*
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+import android.animation.ObjectAnimator
 
 class SearchActivity : AppCompatActivity() {
     private lateinit var searchEditText: EditText
@@ -36,7 +36,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchHistoryTitle: TextView
 
     private var queryText: String? = null
-    private var searchJob: Job? = null
+    private val handler = Handler(Looper.getMainLooper()) // Создаем Handler
+    private var searchRunnable: Runnable? = null // Для хранения текущей задачи
     private var clickAllowed = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +47,7 @@ class SearchActivity : AppCompatActivity() {
         // Инициализация Toolbar
         val toolbar: MaterialToolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+        supportActionBar?.title = getString(R.string.search_hint)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
 
@@ -99,22 +101,27 @@ class SearchActivity : AppCompatActivity() {
         // Обработка ввода текста
         searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 queryText = s?.toString()
                 clearButton.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
 
-                searchJob?.cancel()
-                searchJob = CoroutineScope(Dispatchers.Main).launch {
-                    delay(2000)
-                    queryText?.let {
-                        if (it.isNotEmpty()) performSearch(it)
-                    }
-                }
+                // Удаляем предыдущую задачу
+                searchRunnable?.let { handler.removeCallbacks(it) }
 
-                if (s.isNullOrEmpty()) {
-                    resetSearchUI()
+                if (queryText.isNullOrEmpty()) {
+                    resetSearchUI() // Если текст пустой, сбрасываем интерфейс
+                } else {
+                    // Создаем новую задачу поиска
+                    searchRunnable = Runnable {
+                        queryText?.let {
+                            if (it.isNotEmpty()) performSearch(it)
+                        }
+                    }
+                    handler.postDelayed(searchRunnable!!, 2000) // Задержка 2 секунды
                 }
             }
+
             override fun afterTextChanged(s: Editable?) {}
         })
 
@@ -146,6 +153,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun performSearch(query: String) {
         progressBar.visibility = View.VISIBLE
+        startProgressBarAnimation() // Анимация запускается сразу
         recyclerView.visibility = View.GONE
         hideError()
 
@@ -162,6 +170,8 @@ class SearchActivity : AppCompatActivity() {
         api.searchTracks(query).enqueue(object : Callback<Track.SearchResponse> {
             override fun onResponse(call: Call<Track.SearchResponse>, response: Response<Track.SearchResponse>) {
                 progressBar.visibility = View.GONE
+                stopProgressBarAnimation() // Останавливаем анимацию после ответа
+
                 if (response.isSuccessful) {
                     val tracks = response.body()?.results ?: emptyList()
                     if (tracks.isEmpty()) {
@@ -178,10 +188,12 @@ class SearchActivity : AppCompatActivity() {
 
             override fun onFailure(call: Call<Track.SearchResponse>, t: Throwable) {
                 progressBar.visibility = View.GONE
+                stopProgressBarAnimation() // Останавливаем анимацию при ошибке
                 showError("connection")
             }
         })
     }
+
 
     // Метод для загрузки истории поиска
     private fun loadSearchHistory() {
@@ -193,6 +205,7 @@ class SearchActivity : AppCompatActivity() {
         searchHistoryTitle.visibility = if (history.isNotEmpty()) View.VISIBLE else View.GONE
         clearHistoryButton.visibility = if (history.isNotEmpty()) View.VISIBLE else View.GONE
     }
+
     // Метод для отображения ошибок
     private fun showError(errorType: String) {
         val errorIcon: ImageView = findViewById(R.id.error_icon)
@@ -265,5 +278,15 @@ class SearchActivity : AppCompatActivity() {
     interface iTunesApiService {
         @GET("search")
         fun searchTracks(@Query("term") searchText: String): Call<Track.SearchResponse>
+    }
+    private fun startProgressBarAnimation() {
+        val animator = ObjectAnimator.ofFloat(progressBar, "rotation", 0f, 360f)
+        animator.duration = 1000 // Продолжительность анимации в миллисекундах
+        animator.repeatCount = ObjectAnimator.INFINITE // Бесконечное повторение
+        animator.start()
+    }
+
+    private fun stopProgressBarAnimation() {
+        progressBar.clearAnimation() // Очищаем анимацию
     }
 }

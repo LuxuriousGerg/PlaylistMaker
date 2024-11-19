@@ -29,13 +29,13 @@ class PlayerActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
 
     private val updateTimeRunnable = object : Runnable {
+        private val timeFormatter = java.text.SimpleDateFormat("mm:ss", java.util.Locale.getDefault())
+
         override fun run() {
             mediaPlayer?.let {
                 if (it.isPlaying) {
-                    val currentPosition = it.currentPosition / 1000
-                    val minutes = currentPosition / 60
-                    val seconds = currentPosition % 60
-                    currentTimeTextView.text = String.format("%02d:%02d", minutes, seconds)
+                    val currentPosition = it.currentPosition
+                    currentTimeTextView.text = timeFormatter.format(currentPosition)
                     handler.postDelayed(this, 500)
                 }
             }
