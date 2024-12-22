@@ -42,7 +42,7 @@
         android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
         tools:targetApi="31">
         <activity
-            android:name=".Presentation.ui.main.MainActivity"
+            android:name=".presentation.ui.main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -51,15 +51,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Presentation.ui.search.SearchActivity"
+            android:name=".presentation.ui.search.SearchActivity"
             android:exported="true" />
         <activity
-            android:name=".Presentation.ui.library.LibraryActivity"
+            android:name=".presentation.ui.library.LibraryActivity"
             android:exported="true" />
         <activity
-            android:name=".Presentation.ui.settings.SettingsActivity"
+            android:name=".presentation.ui.settings.SettingsActivity"
             android:exported="true" />
-        <activity android:name=".Presentation.ui.player.PlayerActivity" />
+        <activity android:name=".presentation.ui.player.PlayerActivity" />
 
     </application>
 

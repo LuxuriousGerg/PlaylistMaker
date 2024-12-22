@@ -1,4 +1,4 @@
-package com.example.playlistmaker.Presentation.ui.player
+package com.example.playlistmaker.presentation.ui.player
 
 import android.os.Bundle
 import android.os.Handler
@@ -11,8 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.Creator
 import com.example.playlistmaker.R
-import com.example.playlistmaker.data.dto.Track
 import com.example.playlistmaker.domain.interactors.PlayerInteractor
+import com.example.playlistmaker.domain.models.Track
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var trackTitle: TextView
@@ -21,6 +21,11 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var pauseButton: ImageView
     private lateinit var currentTimeTextView: TextView
     private lateinit var backButton: ImageButton
+    private lateinit var durationValue: TextView
+    private lateinit var albumValue: TextView
+    private lateinit var yearValue: TextView
+    private lateinit var genreValue: TextView
+    private lateinit var countryValue: TextView
 
 
     private val handler = Handler(Looper.getMainLooper())
@@ -41,6 +46,11 @@ class PlayerActivity : AppCompatActivity() {
         // Инициализация UI
         setupUI()
 
+        // Включение прокрутки (marquee) для trackTitle и artistName
+        trackTitle.isSelected = true
+        artistName.isSelected = true
+        albumValue.isSelected = true // Если требуется прокрутка для альбома
+
         // Получаем переданный трек
         val track = intent.getSerializableExtra("track") as? Track
         track?.let { setupTrackInfo(it) }
@@ -52,6 +62,11 @@ class PlayerActivity : AppCompatActivity() {
         playButton = findViewById(R.id.play)
         pauseButton = findViewById(R.id.pause)
         currentTimeTextView = findViewById(R.id.current_time)
+        durationValue = findViewById(R.id.info_duration_value)
+        albumValue = findViewById(R.id.info_album_value)
+        yearValue = findViewById(R.id.info_year_value)
+        genreValue = findViewById(R.id.info_genre_value)
+        countryValue = findViewById(R.id.info_country_value)
 
         playButton.setOnClickListener { togglePlayback() }
         pauseButton.setOnClickListener { togglePlayback() }
@@ -60,6 +75,11 @@ class PlayerActivity : AppCompatActivity() {
     private fun setupTrackInfo(track: Track) {
         trackTitle.text = track.trackName
         artistName.text = track.artistName
+        durationValue.text = track.formatTrackTime(track.trackTimeMillis)
+        albumValue.text = track.collectionName
+        yearValue.text = track.getReleaseYear()
+        genreValue.text = track.primaryGenreName
+        countryValue.text = track.country
 
         Glide.with(this)
             .load(track.getCoverArtwork())

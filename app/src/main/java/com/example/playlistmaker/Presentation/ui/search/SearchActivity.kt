@@ -1,4 +1,4 @@
-package com.example.playlistmaker.Presentation.ui.search
+package com.example.playlistmaker.presentation.ui.search
 
 import android.animation.ObjectAnimator
 import android.content.Intent
@@ -17,11 +17,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.Creator
-import com.example.playlistmaker.Presentation.ui.player.PlayerActivity
 import com.example.playlistmaker.R
 import com.example.playlistmaker.data.repository.SearchHistory
 import com.example.playlistmaker.domain.interactors.HistoryInteractor
 import com.example.playlistmaker.domain.interactors.SearchTracksInteractor
+import com.example.playlistmaker.presentation.ui.player.PlayerActivity
 import com.google.android.material.appbar.MaterialToolbar
 import kotlinx.coroutines.launch
 
@@ -177,6 +177,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun resetSearchUI() {
         searchEditText.clearFocus()
+        loadSearchHistory()
 
         findViewById<View>(R.id.error_icon)?.visibility = View.GONE
         findViewById<View>(R.id.error_text)?.visibility = View.GONE

@@ -1,6 +1,6 @@
 package com.example.playlistmaker.domain.repository
 
-import com.example.playlistmaker.data.dto.Track
+import com.example.playlistmaker.domain.models.Track
 
 interface HistoryRepository {
     fun getHistory(): List<Track>
