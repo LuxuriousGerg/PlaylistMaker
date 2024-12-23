@@ -39,7 +39,6 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchInteractor: SearchTracksInteractor
     private lateinit var searchHistory: SearchHistory
 
-
     private var queryText: String? = null
     private val handler = Handler(Looper.getMainLooper())
     private var searchRunnable: Runnable? = null
@@ -117,7 +116,11 @@ class SearchActivity : AppCompatActivity() {
         // Обработка нажатия "Done" на клавиатуре
         searchEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                queryText?.let { performSearch(it) }
+                // Отменяем запланированный Runnable перед выполнением поиска
+                searchRunnable?.let { handler.removeCallbacks(it) }
+                if (queryText?.isNotEmpty() == true) {
+                    performSearch(queryText!!)
+                }
                 hideKeyboard()
                 true
             } else false
@@ -149,15 +152,15 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun performSearch(query: String) {
+        Log.d("SearchActivity", "Performing search for query: $query")
         progressBar.visibility = View.VISIBLE
         startProgressBarAnimation()
         recyclerView.visibility = View.GONE
         searchHistoryTitle.visibility = View.GONE
-        clearHistoryButton.visibility = View.GONE
 
         lifecycleScope.launch {
             try {
-                val tracks = searchInteractor.search(query)
+                val tracks = searchInteractor.search(query).filter { it.trackTimeMillis > 0 }
                 progressBar.visibility = View.GONE
                 if (tracks.isEmpty()) {
                     showError("no_results")
@@ -168,12 +171,9 @@ class SearchActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 progressBar.visibility = View.GONE
                 showError("connection")
-                Log.e("SearchActivity", "Ошибка при поиске: ${e.message}", e)
             }
         }
     }
-
-
 
     private fun resetSearchUI() {
         searchEditText.clearFocus()
