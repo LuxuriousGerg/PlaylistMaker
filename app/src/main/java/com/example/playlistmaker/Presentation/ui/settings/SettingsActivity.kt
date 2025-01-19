@@ -5,12 +5,12 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.textview.MaterialTextView
 import com.example.playlistmaker.Creator
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.interactors.SettingsInteractor
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
+import com.google.android.material.textview.MaterialTextView
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -21,41 +21,36 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        // Инициализация интерактора
+        // Инициализируем интерактор через DI
         settingsInteractor = Creator.provideSettingsInteractor(this)
 
-        // Инициализация Toolbar
+        // Устанавливаем Toolbar
         val toolbar: MaterialToolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener { finish() }
 
         // Установка заголовка
         supportActionBar?.title = getString(R.string.settings_title)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        // Обработка кнопки "Назад"
-        toolbar.setNavigationOnClickListener {
-            finish()
-        }
-
-        // Инициализация UI
+        // Инициализируем UI
         setupUI()
-
-        // Настройка переключателя темы
         setupThemeSwitcher()
     }
 
     private fun setupUI() {
-        // Обработка кнопки "Поделиться приложением"
+        // Кнопка "Поделиться приложением"
         findViewById<MaterialTextView>(R.id.textView_share_app).setOnClickListener {
             shareApp()
         }
 
-        // Обработка кнопки "Написать в поддержку"
+        // Кнопка "Написать в поддержку"
         findViewById<MaterialTextView>(R.id.textView_support).setOnClickListener {
             writeToSupport()
         }
 
-        // Обработка кнопки "Пользовательское соглашение"
+        // Кнопка "Пользовательское соглашение"
         findViewById<MaterialTextView>(R.id.textView_terms).setOnClickListener {
             openUserAgreement()
         }
@@ -68,7 +63,7 @@ class SettingsActivity : AppCompatActivity() {
         // Устанавливаем текущее состояние переключателя
         themeSwitcher.isChecked = settingsInteractor.isDarkThemeEnabled()
 
-        // Обработка переключения темы
+        // Слушатель переключателя темы
         themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
             settingsInteractor.setDarkThemeEnabled(isChecked)
             applyTheme(isChecked)
@@ -90,9 +85,7 @@ class SettingsActivity : AppCompatActivity() {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, shareText)
         }
-        if (shareIntent.resolveActivity(packageManager) != null) {
-            startActivity(Intent.createChooser(shareIntent, null))
-        }
+        startActivity(Intent.createChooser(shareIntent, null))
     }
 
     private fun writeToSupport() {
@@ -102,26 +95,21 @@ class SettingsActivity : AppCompatActivity() {
             putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_subject))
             putExtra(Intent.EXTRA_TEXT, getString(R.string.support_email))
         }
-        if (emailIntent.resolveActivity(packageManager) != null) {
-            startActivity(emailIntent)
-        }
+        startActivity(Intent.createChooser(emailIntent, getString(R.string.contact_support)))
     }
 
     private fun openUserAgreement() {
         val url = getString(R.string.terms_url)
         val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        if (browserIntent.resolveActivity(packageManager) != null) {
-            startActivity(browserIntent)
-        }
+        startActivity(browserIntent)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+        return if (item.itemId == android.R.id.home) {
+            finish()
+            true
+        } else {
+            super.onOptionsItemSelected(item)
         }
     }
 }

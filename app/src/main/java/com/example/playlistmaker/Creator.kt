@@ -14,7 +14,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object Creator {
 
-    // Settings Interactor
     fun provideSettingsInteractor(context: Context): SettingsInteractor {
         return SettingsInteractorImpl(provideSettingsRepository(context))
     }
@@ -24,7 +23,6 @@ object Creator {
         return SettingsRepositoryImpl(sharedPreferences)
     }
 
-    // History Interactor
     fun provideHistoryInteractor(context: Context): HistoryInteractor {
         return HistoryInteractorImpl(provideHistoryRepository(context))
     }
@@ -34,7 +32,6 @@ object Creator {
         return SearchHistory(sharedPreferences)
     }
 
-    // Search Tracks Interactor
     fun provideSearchTracksInteractor(): SearchTracksInteractor {
         return SearchTracksInteractorImpl(provideTrackRepository())
     }
@@ -51,7 +48,6 @@ object Creator {
             .create(iTunesApiService::class.java)
     }
 
-    // Player Interactor
     fun providePlayerInteractor(): PlayerInteractor {
         return PlayerInteractorImpl()
     }
