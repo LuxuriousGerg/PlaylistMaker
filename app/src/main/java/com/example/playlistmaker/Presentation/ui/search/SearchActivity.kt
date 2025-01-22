@@ -1,5 +1,7 @@
 package com.example.playlistmaker.presentation.ui.search
 
+import SearchViewModel
+import SearchViewModelFactory
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
@@ -9,8 +11,6 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -19,13 +19,13 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.Creator
-import com.example.playlistmaker.presentation.viewmodel.SearchViewModel
-import com.example.playlistmaker.presentation.viewmodel.SearchViewModelFactory
 import com.example.playlistmaker.presentation.ui.player.PlayerActivity
+import kotlinx.coroutines.launch
 
 class SearchActivity : AppCompatActivity() {
     private lateinit var searchEditText: EditText
@@ -43,18 +43,18 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var toolbar: Toolbar
 
     private lateinit var searchViewModel: SearchViewModel
-    private val handler = Handler(Looper.getMainLooper())
-    private var searchRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
         val searchInteractor = Creator.provideSearchTracksInteractor()
-        val historyInteractor = Creator.provideHistoryInteractor(this)
+        val sharedPreferences = getSharedPreferences("my_prefs", Context.MODE_PRIVATE)
 
-        searchViewModel = ViewModelProvider(this, SearchViewModelFactory(searchInteractor, historyInteractor))
-            .get(SearchViewModel::class.java)
+        searchViewModel = ViewModelProvider(
+            this,
+            SearchViewModelFactory(searchInteractor, sharedPreferences)
+        ).get(SearchViewModel::class.java)
 
         setupUI()
         setupObservers()
@@ -62,6 +62,7 @@ class SearchActivity : AppCompatActivity() {
 
         searchViewModel.loadSearchHistory()
     }
+
 
     private fun setupUI() {
         toolbar = findViewById(R.id.toolbar)
@@ -88,6 +89,13 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
+        retryButton.setOnClickListener {
+            searchViewModel.viewModelScope.launch {
+                startProgressBarAnimation()
+                searchViewModel.searchTracks(query = searchEditText.text.toString().trim())
+            }
+        }
+
         trackAdapter.setOnTrackClickListener { track ->
             searchViewModel.addToSearchHistory(track)
             val intent = Intent(this, PlayerActivity::class.java)
@@ -110,19 +118,23 @@ class SearchActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearButton.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
-                searchRunnable?.let { handler.removeCallbacks(it) }
 
                 if (!s.isNullOrEmpty()) {
                     searchHistoryTitle.visibility = View.GONE
                     clearHistoryButton.visibility = View.GONE
                     recyclerView.visibility = View.GONE
-                    searchRunnable = Runnable { searchViewModel.searchTracks(s.toString()) }
-                    handler.postDelayed(searchRunnable!!, 2000)
+                    startProgressBarAnimation()
+
+                    searchViewModel.viewModelScope.launch {
+                        kotlinx.coroutines.delay(2000)
+                        searchViewModel.searchTracks(query = s.toString().trim())
+                    }
                 } else {
                     searchViewModel.loadSearchHistory()
                     hideError()
                 }
             }
+
 
             override fun afterTextChanged(s: Editable?) {}
         })
@@ -132,12 +144,18 @@ class SearchActivity : AppCompatActivity() {
         searchViewModel.searchResults.observe(this) { tracks ->
             trackAdapter.updateTracks(tracks)
             recyclerView.visibility = if (tracks.isNotEmpty()) View.VISIBLE else View.GONE
+            stopProgressBarAnimation()
 
-            if (tracks.isEmpty()) {
+            // Если ошибка уже установлена, не сбрасываем ее
+            if (tracks.isEmpty() && searchViewModel.errorType.value == null) {
                 showError("no_results")
             } else {
                 hideError()
             }
+        }
+
+        searchViewModel.errorType.observe(this) { error ->
+            error?.let { showError(it) } ?: hideError()
         }
 
         searchViewModel.searchHistory.observe(this) { history ->
@@ -148,10 +166,15 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    private fun stopProgressBarAnimation() {
+        progressBar.visibility = View.GONE
+    }
+
     private fun startProgressBarAnimation() {
+        progressBar.visibility = View.VISIBLE // Показываем прогресс-бар перед анимацией
         val animator = ObjectAnimator.ofFloat(progressBar, "rotation", 0f, 360f)
-        animator.duration = 1000 // Продолжительность анимации
-        animator.repeatCount = ObjectAnimator.INFINITE // Бесконечное повторение
+        animator.duration = 1000
+        animator.repeatCount = ObjectAnimator.INFINITE
         animator.start()
     }
 

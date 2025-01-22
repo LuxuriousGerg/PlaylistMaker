@@ -1,7 +1,7 @@
 package com.example.playlistmaker.presentation.viewmodel
 
-import android.util.Log
-import androidx.appcompat.app.AppCompatDelegate
+import android.content.Intent
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,18 +12,44 @@ class SettingsViewModel(private val settingsInteractor: SettingsInteractor) : Vi
     private val _isDarkThemeEnabled = MutableLiveData<Boolean>()
     val isDarkThemeEnabled: LiveData<Boolean> get() = _isDarkThemeEnabled
 
+    private val _shareAppEvent = MutableLiveData<Intent>()
+    val shareAppEvent: LiveData<Intent> get() = _shareAppEvent
+
+    private val _supportEmailEvent = MutableLiveData<Intent>()
+    val supportEmailEvent: LiveData<Intent> get() = _supportEmailEvent
+
+    private val _userAgreementEvent = MutableLiveData<Intent>()
+    val userAgreementEvent: LiveData<Intent> get() = _userAgreementEvent
+
     init {
         _isDarkThemeEnabled.value = settingsInteractor.isDarkThemeEnabled()
-        Log.d("SettingsViewModel", "Загружена тема: ${_isDarkThemeEnabled.value}")
     }
 
     fun toggleTheme(isEnabled: Boolean) {
-        Log.d("SettingsViewModel", "Изменение темы: $isEnabled")
         settingsInteractor.setDarkThemeEnabled(isEnabled)
         _isDarkThemeEnabled.value = isEnabled
+    }
 
-        // 🔥 Применение темы сразу
-        val mode = if (isEnabled) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-        AppCompatDelegate.setDefaultNightMode(mode)
+    fun shareApp(shareText: String) {
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, shareText)
+        }
+        _shareAppEvent.value = shareIntent
+    }
+
+    fun writeToSupport(email: String, subject: String, message: String) {
+        val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("mailto:")
+            putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+            putExtra(Intent.EXTRA_SUBJECT, subject)
+            putExtra(Intent.EXTRA_TEXT, message)
+        }
+        _supportEmailEvent.value = emailIntent
+    }
+
+    fun openUserAgreement(url: String) {
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        _userAgreementEvent.value = browserIntent
     }
 }

@@ -1,16 +1,20 @@
 package com.example.playlistmaker.presentation.ui.player
 
+import PlayerViewModel
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
+import com.example.playlistmaker.Creator
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.models.Track
-import com.example.playlistmaker.presentation.viewmodel.PlayerViewModel
+import com.example.playlistmaker.presentation.viewmodel.PlayerViewModelFactory
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var trackTitle: TextView
@@ -20,17 +24,39 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var backButton: ImageButton
     private lateinit var currentTimeTextView: TextView
 
-    private val playerViewModel: PlayerViewModel by viewModels()
+    private lateinit var playerViewModel: PlayerViewModel
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.audio_player)
 
+        val playerInteractor = Creator.providePlayerInteractor()
+        val factory = PlayerViewModelFactory(playerInteractor)
+        playerViewModel = ViewModelProvider(this, factory)[PlayerViewModel::class.java]
+
         setupUI()
         setupObservers()
 
-        val track = intent.getSerializableExtra("track") as? Track
-        track?.let { playerViewModel.preparePlayer(it) }
+        val track = intent.getParcelableExtra("track", Track::class.java)
+        track?.let {
+            trackTitle.text = it.trackName
+            artistName.text = it.artistName
+            it.previewUrl?.let { url ->
+                playerViewModel.preparePlayer(url)
+            }
+
+            Glide.with(this)
+                .load(it.getCoverArtwork())
+                .placeholder(R.drawable.placeholder_image)
+                .into(findViewById(R.id.album_cover))
+
+            findViewById<TextView>(R.id.info_album_value).text = it.collectionName ?: "Unknown Album"
+            findViewById<TextView>(R.id.info_year_value).text = it.getReleaseYear()
+            findViewById<TextView>(R.id.info_genre_value).text = it.primaryGenreName ?: "Unknown Genre"
+            findViewById<TextView>(R.id.info_country_value).text = it.country ?: "Unknown Country"
+            findViewById<TextView>(R.id.info_duration_value).text = it.formatTrackTime(it.trackTimeMillis)
+        }
     }
 
     private fun setupUI() {
@@ -41,18 +67,24 @@ class PlayerActivity : AppCompatActivity() {
         backButton = findViewById(R.id.back_button)
         currentTimeTextView = findViewById(R.id.current_time)
 
+        trackTitle.isSelected = true
+        artistName.isSelected = true
+        findViewById<TextView>(R.id.info_album_value).isSelected = true
+
         backButton.setOnClickListener { finish() }
         playButton.setOnClickListener { playerViewModel.togglePlayback() }
         pauseButton.setOnClickListener { playerViewModel.togglePlayback() }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun setupObservers() {
-        playerViewModel.track.observe(this) { track ->
-            trackTitle.text = track.trackName
-            artistName.text = track.artistName
+        val track: Track? = intent.getParcelableExtra("track", Track::class.java)
 
+        track?.let {
+            trackTitle.text = it.trackName
+            artistName.text = it.artistName
             Glide.with(this)
-                .load(track.getCoverArtwork())
+                .load(it.getCoverArtwork())
                 .placeholder(R.drawable.placeholder_image)
                 .into(findViewById(R.id.album_cover))
         }
@@ -66,4 +98,5 @@ class PlayerActivity : AppCompatActivity() {
             currentTimeTextView.text = time
         }
     }
+
 }
