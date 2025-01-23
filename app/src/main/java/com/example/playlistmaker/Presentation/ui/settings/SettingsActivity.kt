@@ -3,125 +3,82 @@ package com.example.playlistmaker.presentation.ui.settings
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.textview.MaterialTextView
-import com.example.playlistmaker.Creator
 import com.example.playlistmaker.R
-import com.example.playlistmaker.domain.interactors.SettingsInteractor
+import com.example.playlistmaker.Creator
+import com.example.playlistmaker.presentation.viewmodel.SettingsViewModel
+import com.example.playlistmaker.presentation.viewmodel.SettingsViewModelFactory
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
+import com.google.android.material.textview.MaterialTextView
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var themeSwitcher: SwitchMaterial
-    private lateinit var settingsInteractor: SettingsInteractor
+
+    private val settingsViewModel: SettingsViewModel by viewModels {
+        SettingsViewModelFactory(Creator.provideSettingsInteractor(this))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        // Инициализация интерактора
-        settingsInteractor = Creator.provideSettingsInteractor(this)
-
-        // Инициализация Toolbar
-        val toolbar: MaterialToolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
-
-        // Установка заголовка
-        supportActionBar?.title = getString(R.string.settings_title)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        // Обработка кнопки "Назад"
-        toolbar.setNavigationOnClickListener {
-            finish()
-        }
-
-        // Инициализация UI
         setupUI()
-
-        // Настройка переключателя темы
-        setupThemeSwitcher()
+        setupObservers()
+        setupListeners()
     }
 
     private fun setupUI() {
-        // Обработка кнопки "Поделиться приложением"
-        findViewById<MaterialTextView>(R.id.textView_share_app).setOnClickListener {
-            shareApp()
+        val toolbar: MaterialToolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.apply {
+            title = getString(R.string.settings_title)
+            setDisplayHomeAsUpEnabled(true)
         }
+        toolbar.setNavigationOnClickListener { finish() }
 
-        // Обработка кнопки "Написать в поддержку"
-        findViewById<MaterialTextView>(R.id.textView_support).setOnClickListener {
-            writeToSupport()
-        }
-
-        // Обработка кнопки "Пользовательское соглашение"
-        findViewById<MaterialTextView>(R.id.textView_terms).setOnClickListener {
-            openUserAgreement()
-        }
-
-        // Инициализация переключателя темы
         themeSwitcher = findViewById(R.id.switch_theme)
     }
 
-    private fun setupThemeSwitcher() {
-        // Устанавливаем текущее состояние переключателя
-        themeSwitcher.isChecked = settingsInteractor.isDarkThemeEnabled()
+    private fun setupObservers() {
+        settingsViewModel.isDarkThemeEnabled.observe(this) { isEnabled ->
+            themeSwitcher.isChecked = isEnabled
+        }
 
-        // Обработка переключения темы
+        settingsViewModel.shareAppEvent.observe(this) { intent ->
+            startActivity(Intent.createChooser(intent, null))
+        }
+
+        settingsViewModel.supportEmailEvent.observe(this) { intent ->
+            startActivity(Intent.createChooser(intent, getString(R.string.contact_support)))
+        }
+
+        settingsViewModel.userAgreementEvent.observe(this) { intent ->
+            startActivity(intent)
+        }
+    }
+
+    private fun setupListeners() {
         themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
-            settingsInteractor.setDarkThemeEnabled(isChecked)
-            applyTheme(isChecked)
+            settingsViewModel.toggleTheme(isChecked)
         }
-    }
 
-    private fun applyTheme(isDarkThemeEnabled: Boolean) {
-        val mode = if (isDarkThemeEnabled) {
-            androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
-        } else {
-            androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+        findViewById<MaterialTextView>(R.id.textView_share_app).setOnClickListener {
+            settingsViewModel.shareApp(getString(R.string.share_message))
         }
-        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(mode)
-    }
 
-    private fun shareApp() {
-        val shareText = getString(R.string.share_message)
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, shareText)
+        findViewById<MaterialTextView>(R.id.textView_support).setOnClickListener {
+            settingsViewModel.writeToSupport(
+                email = "support@example.com",
+                subject = getString(R.string.support_subject),
+                message = getString(R.string.support_email)
+            )
         }
-        if (shareIntent.resolveActivity(packageManager) != null) {
-            startActivity(Intent.createChooser(shareIntent, null))
-        }
-    }
 
-    private fun writeToSupport() {
-        val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:")
-            putExtra(Intent.EXTRA_EMAIL, arrayOf("support@example.com"))
-            putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_subject))
-            putExtra(Intent.EXTRA_TEXT, getString(R.string.support_email))
-        }
-        if (emailIntent.resolveActivity(packageManager) != null) {
-            startActivity(emailIntent)
-        }
-    }
-
-    private fun openUserAgreement() {
-        val url = getString(R.string.terms_url)
-        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        if (browserIntent.resolveActivity(packageManager) != null) {
-            startActivity(browserIntent)
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+        findViewById<MaterialTextView>(R.id.textView_terms).setOnClickListener {
+            settingsViewModel.openUserAgreement(getString(R.string.terms_url))
         }
     }
 }

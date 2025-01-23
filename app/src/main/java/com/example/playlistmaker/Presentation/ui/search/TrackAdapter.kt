@@ -1,6 +1,5 @@
 package com.example.playlistmaker.presentation.ui.search
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,7 +28,6 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
         holder.bind(track)
 
         holder.itemView.setOnClickListener {
-            Log.d("TrackClick", "Track clicked: ${track.trackName}, Artist: ${track.artistName}, Duration: ${track.formatTrackTime(track.trackTimeMillis)}, Artwork: ${track.artworkUrl100}")
             onTrackClickListener?.invoke(track)
         }
     }
@@ -37,24 +35,8 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
     override fun getItemCount() = trackList.size
 
     fun updateTracks(newTracks: List<Track>) {
-        // Фильтруем треки с пустым названием или временем, равным нулю
-        val filteredTracks = newTracks.filter { track ->
-            // Добавляем проверку на null
-            val isTrackNameValid = track.trackName?.isNotEmpty() == true
-            val isTrackTimeValid = track.trackTimeMillis > 0
-
-            if (!isTrackNameValid) {
-                Log.e("TrackAdapter", "Track name is null or empty for track: $track")
-            }
-            if (!isTrackTimeValid) {
-                Log.e("TrackAdapter", "Track time is zero or negative for track: $track")
-            }
-
-            isTrackNameValid && isTrackTimeValid
-        }
-
         trackList.clear()
-        trackList.addAll(filteredTracks)
+        trackList.addAll(newTracks)
         notifyDataSetChanged()
     }
 
@@ -68,20 +50,16 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
         private val trackArtwork: ImageView = itemView.findViewById(R.id.album_cover)
 
         fun bind(track: Track) {
-            // Проверка на null перед присвоением значений
-            trackName.text = track.trackName ?: "Неизвестный трек"
-            artistAndTime.text = "${track.artistName ?: "Неизвестный артист"} • ${track.formatTrackTime(track.trackTimeMillis)}"
+            trackName.text = track.trackName
+            artistAndTime.text = "${track.artistName} • ${track.formatTrackTime(track.trackTimeMillis)}"
 
-
-            // Загрузка обложки трека с помощью Glide
             Glide.with(itemView)
                 .load(track.getCoverArtwork())
-                .apply(RequestOptions().transform(RoundedCorners(3)))
+                .apply(RequestOptions().transform(RoundedCorners(8)))
                 .placeholder(R.drawable.placeholder_image)
                 .error(R.drawable.placeholder_image)
                 .into(trackArtwork)
 
-            // Устанавливаем фокус на текстовые поля для включения marquee
             trackName.isSelected = true
             artistAndTime.isSelected = true
         }

@@ -1,59 +1,62 @@
 package com.example.playlistmaker.presentation.ui.player
 
+import PlayerViewModel
+import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.Creator
 import com.example.playlistmaker.R
-import com.example.playlistmaker.domain.interactors.PlayerInteractor
 import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.presentation.viewmodel.PlayerViewModelFactory
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var trackTitle: TextView
     private lateinit var artistName: TextView
     private lateinit var playButton: ImageView
     private lateinit var pauseButton: ImageView
-    private lateinit var currentTimeTextView: TextView
     private lateinit var backButton: ImageButton
-    private lateinit var durationValue: TextView
-    private lateinit var albumValue: TextView
-    private lateinit var yearValue: TextView
-    private lateinit var genreValue: TextView
-    private lateinit var countryValue: TextView
+    private lateinit var currentTimeTextView: TextView
 
+    private lateinit var playerViewModel: PlayerViewModel
 
-    private val handler = Handler(Looper.getMainLooper())
-    private lateinit var playerInteractor: PlayerInteractor
-    private var isPlaying = false
-
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.audio_player)
-        // Инициализация кнопки "Назад"
-        backButton = findViewById(R.id.back_button)
-        backButton.setOnClickListener {
-            finish() // Закрытие текущей активности
-        }
-        // Получаем интерактор
-        playerInteractor = Creator.providePlayerInteractor()
 
-        // Инициализация UI
+        val playerInteractor = Creator.providePlayerInteractor()
+        val factory = PlayerViewModelFactory(playerInteractor)
+        playerViewModel = ViewModelProvider(this, factory)[PlayerViewModel::class.java]
+
         setupUI()
+        setupObservers()
 
-        // Включение прокрутки (marquee) для trackTitle и artistName
-        trackTitle.isSelected = true
-        artistName.isSelected = true
-        albumValue.isSelected = true // Если требуется прокрутка для альбома
+        val track = intent.getParcelableExtra("track", Track::class.java)
+        track?.let {
+            trackTitle.text = it.trackName
+            artistName.text = it.artistName
+            it.previewUrl?.let { url ->
+                playerViewModel.preparePlayer(url)
+            }
 
-        // Получаем переданный трек
-        val track = intent.getSerializableExtra("track") as? Track
-        track?.let { setupTrackInfo(it) }
+            Glide.with(this)
+                .load(it.getCoverArtwork())
+                .placeholder(R.drawable.placeholder_image)
+                .into(findViewById(R.id.album_cover))
+
+            findViewById<TextView>(R.id.info_album_value).text = it.collectionName ?: "Unknown Album"
+            findViewById<TextView>(R.id.info_year_value).text = it.getReleaseYear()
+            findViewById<TextView>(R.id.info_genre_value).text = it.primaryGenreName ?: "Unknown Genre"
+            findViewById<TextView>(R.id.info_country_value).text = it.country ?: "Unknown Country"
+            findViewById<TextView>(R.id.info_duration_value).text = it.formatTrackTime(it.trackTimeMillis)
+        }
     }
 
     private fun setupUI() {
@@ -61,79 +64,39 @@ class PlayerActivity : AppCompatActivity() {
         artistName = findViewById(R.id.artist_name)
         playButton = findViewById(R.id.play)
         pauseButton = findViewById(R.id.pause)
+        backButton = findViewById(R.id.back_button)
         currentTimeTextView = findViewById(R.id.current_time)
-        durationValue = findViewById(R.id.info_duration_value)
-        albumValue = findViewById(R.id.info_album_value)
-        yearValue = findViewById(R.id.info_year_value)
-        genreValue = findViewById(R.id.info_genre_value)
-        countryValue = findViewById(R.id.info_country_value)
 
-        playButton.setOnClickListener { togglePlayback() }
-        pauseButton.setOnClickListener { togglePlayback() }
+        trackTitle.isSelected = true
+        artistName.isSelected = true
+        findViewById<TextView>(R.id.info_album_value).isSelected = true
+
+        backButton.setOnClickListener { finish() }
+        playButton.setOnClickListener { playerViewModel.togglePlayback() }
+        pauseButton.setOnClickListener { playerViewModel.togglePlayback() }
     }
 
-    private fun setupTrackInfo(track: Track) {
-        trackTitle.text = track.trackName
-        artistName.text = track.artistName
-        durationValue.text = track.formatTrackTime(track.trackTimeMillis)
-        albumValue.text = track.collectionName
-        yearValue.text = track.getReleaseYear()
-        genreValue.text = track.primaryGenreName
-        countryValue.text = track.country
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun setupObservers() {
+        val track: Track? = intent.getParcelableExtra("track", Track::class.java)
 
-        Glide.with(this)
-            .load(track.getCoverArtwork())
-            .placeholder(R.drawable.placeholder_image)
-            .into(findViewById(R.id.album_cover))
-
-        playerInteractor.preparePlayer(
-            track.previewUrl ?: "",
-            onPrepared = {
-                playButton.visibility = View.VISIBLE
-                pauseButton.visibility = View.GONE
-            },
-            onCompletion = {
-                playButton.visibility = View.VISIBLE
-                pauseButton.visibility = View.GONE
-                currentTimeTextView.text = "00:00"
-                handler.removeCallbacks(updateTimeRunnable)
-            }
-        )
-    }
-
-    private fun togglePlayback() {
-        if (isPlaying) {
-            playerInteractor.pause()
-            playButton.visibility = View.VISIBLE
-            pauseButton.visibility = View.GONE
-        } else {
-            playerInteractor.play()
-            playButton.visibility = View.GONE
-            pauseButton.visibility = View.VISIBLE
-            handler.post(updateTimeRunnable)
+        track?.let {
+            trackTitle.text = it.trackName
+            artistName.text = it.artistName
+            Glide.with(this)
+                .load(it.getCoverArtwork())
+                .placeholder(R.drawable.placeholder_image)
+                .into(findViewById(R.id.album_cover))
         }
-        isPlaying = !isPlaying
-    }
 
-    private val updateTimeRunnable = object : Runnable {
-        override fun run() {
-            if (playerInteractor.isPlaying()) {
-                currentTimeTextView.text = formatTime(playerInteractor.getCurrentPosition())
-                handler.postDelayed(this, 500)
-            }
+        playerViewModel.isPlaying.observe(this) { isPlaying ->
+            playButton.visibility = if (isPlaying) View.GONE else View.VISIBLE
+            pauseButton.visibility = if (isPlaying) View.VISIBLE else View.GONE
+        }
+
+        playerViewModel.currentTime.observe(this) { time ->
+            currentTimeTextView.text = time
         }
     }
 
-    private fun formatTime(milliseconds: Int): String {
-        val seconds = milliseconds / 1000
-        val minutes = seconds / 60
-        val remainingSeconds = seconds % 60
-        return String.format("%02d:%02d", minutes, remainingSeconds)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        playerInteractor.release()
-        handler.removeCallbacks(updateTimeRunnable)
-    }
 }
