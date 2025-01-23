@@ -2,6 +2,7 @@ package com.example.playlistmaker.presentation.viewmodel
 
 import android.content.Intent
 import android.net.Uri
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -22,12 +23,24 @@ class SettingsViewModel(private val settingsInteractor: SettingsInteractor) : Vi
     val userAgreementEvent: LiveData<Intent> get() = _userAgreementEvent
 
     init {
-        _isDarkThemeEnabled.value = settingsInteractor.isDarkThemeEnabled()
+        val isDarkMode = settingsInteractor.isDarkThemeEnabled()
+        _isDarkThemeEnabled.value = isDarkMode
+        applyTheme(isDarkMode)
     }
 
     fun toggleTheme(isEnabled: Boolean) {
         settingsInteractor.setDarkThemeEnabled(isEnabled)
         _isDarkThemeEnabled.value = isEnabled
+        applyTheme(isEnabled)
+    }
+
+    private fun applyTheme(isDarkMode: Boolean) {
+        val mode = if (isDarkMode) {
+            AppCompatDelegate.MODE_NIGHT_YES
+        } else {
+            AppCompatDelegate.MODE_NIGHT_NO
+        }
+        AppCompatDelegate.setDefaultNightMode(mode)
     }
 
     fun shareApp(shareText: String) {

@@ -14,7 +14,7 @@ import com.bumptech.glide.Glide
 import com.example.playlistmaker.Creator
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.models.Track
-import com.example.playlistmaker.presentation.viewmodel.PlayerViewModelFactory
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var trackTitle: TextView
@@ -24,16 +24,12 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var backButton: ImageButton
     private lateinit var currentTimeTextView: TextView
 
-    private lateinit var playerViewModel: PlayerViewModel
+    private val playerViewModel: PlayerViewModel by viewModel()
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.audio_player)
-
-        val playerInteractor = Creator.providePlayerInteractor()
-        val factory = PlayerViewModelFactory(playerInteractor)
-        playerViewModel = ViewModelProvider(this, factory)[PlayerViewModel::class.java]
 
         setupUI()
         setupObservers()

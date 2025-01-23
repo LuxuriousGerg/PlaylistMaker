@@ -8,18 +8,16 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.playlistmaker.R
 import com.example.playlistmaker.Creator
 import com.example.playlistmaker.presentation.viewmodel.SettingsViewModel
-import com.example.playlistmaker.presentation.viewmodel.SettingsViewModelFactory
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var themeSwitcher: SwitchMaterial
 
-    private val settingsViewModel: SettingsViewModel by viewModels {
-        SettingsViewModelFactory(Creator.provideSettingsInteractor(this))
-    }
+    private val settingsViewModel: SettingsViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,8 +41,8 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        settingsViewModel.isDarkThemeEnabled.observe(this) { isEnabled ->
-            themeSwitcher.isChecked = isEnabled
+        themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
+            settingsViewModel.toggleTheme(isChecked)
         }
 
         settingsViewModel.shareAppEvent.observe(this) { intent ->

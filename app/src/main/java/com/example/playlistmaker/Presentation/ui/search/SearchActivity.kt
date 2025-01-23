@@ -1,13 +1,9 @@
 package com.example.playlistmaker.presentation.ui.search
 
 import SearchViewModel
-import SearchViewModelFactory
 import android.animation.ObjectAnimator
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -18,14 +14,13 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
-import com.example.playlistmaker.Creator
 import com.example.playlistmaker.presentation.ui.player.PlayerActivity
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
     private lateinit var searchEditText: EditText
@@ -41,20 +36,11 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var errorTextNoResults: TextView
     private lateinit var trackAdapter: TrackAdapter
     private lateinit var toolbar: Toolbar
-
-    private lateinit var searchViewModel: SearchViewModel
+    private val searchViewModel: SearchViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-
-        val searchInteractor = Creator.provideSearchTracksInteractor()
-        val sharedPreferences = getSharedPreferences("my_prefs", Context.MODE_PRIVATE)
-
-        searchViewModel = ViewModelProvider(
-            this,
-            SearchViewModelFactory(searchInteractor, sharedPreferences)
-        ).get(SearchViewModel::class.java)
 
         setupUI()
         setupObservers()
