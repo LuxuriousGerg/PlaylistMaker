@@ -23,6 +23,7 @@ class SettingsViewModel(private val settingsInteractor: SettingsInteractor) : Vi
     val userAgreementEvent: LiveData<Intent> get() = _userAgreementEvent
 
     init {
+        // Читаем состояние темы из настроек при создании ViewModel
         val isDarkMode = settingsInteractor.isDarkThemeEnabled()
         _isDarkThemeEnabled.value = isDarkMode
         applyTheme(isDarkMode)
@@ -35,12 +36,10 @@ class SettingsViewModel(private val settingsInteractor: SettingsInteractor) : Vi
     }
 
     private fun applyTheme(isDarkMode: Boolean) {
-        val mode = if (isDarkMode) {
-            AppCompatDelegate.MODE_NIGHT_YES
-        } else {
-            AppCompatDelegate.MODE_NIGHT_NO
-        }
-        AppCompatDelegate.setDefaultNightMode(mode)
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDarkMode) AppCompatDelegate.MODE_NIGHT_YES
+            else AppCompatDelegate.MODE_NIGHT_NO
+        )
     }
 
     fun shareApp(shareText: String) {

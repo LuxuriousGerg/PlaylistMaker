@@ -1,12 +1,9 @@
 package com.example.playlistmaker.presentation.ui.settings
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.playlistmaker.R
-import com.example.playlistmaker.Creator
 import com.example.playlistmaker.presentation.viewmodel.SettingsViewModel
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -16,7 +13,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var themeSwitcher: SwitchMaterial
-
     private val settingsViewModel: SettingsViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,8 +37,9 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
-            settingsViewModel.toggleTheme(isChecked)
+        // Обновляем состояние переключателя при изменении темы
+        settingsViewModel.isDarkThemeEnabled.observe(this) { isDarkMode ->
+            themeSwitcher.isChecked = isDarkMode
         }
 
         settingsViewModel.shareAppEvent.observe(this) { intent ->

@@ -6,19 +6,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.presentation.ui.player.PlayerActivity
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -49,7 +47,6 @@ class SearchActivity : AppCompatActivity() {
         searchViewModel.loadSearchHistory()
     }
 
-
     private fun setupUI() {
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -74,30 +71,75 @@ class SearchActivity : AppCompatActivity() {
         recyclerView.adapter = trackAdapter
     }
 
+    private fun setupObservers() {
+        lifecycleScope.launch {
+            combine(
+                searchViewModel.searchResults,
+                searchViewModel.errorType,
+                searchViewModel.searchHistory
+            ) { tracks, error, history ->
+                Triple(tracks, error, history)
+            }.collect { (tracks, error, history) ->
+                stopProgressBarAnimation() // Останавливаем анимацию загрузки
+
+                if (tracks.isNotEmpty()) {
+                    trackAdapter.updateTracks(tracks)
+                    recyclerView.visibility = View.VISIBLE
+                    hideError()
+                } else if (error == "no_results") {
+                    recyclerView.visibility = View.GONE
+                    showError("no_results")
+                } else if (error != null) {
+                    showError(error)
+                } else if (searchEditText.text.isEmpty()) {
+                    // Если в поиске ничего нет, показываем историю
+                    trackAdapter.updateTracks(history)
+                    searchHistoryTitle.visibility = if (history.isNotEmpty()) View.VISIBLE else View.GONE
+                    clearHistoryButton.visibility = if (history.isNotEmpty()) View.VISIBLE else View.GONE
+                    recyclerView.visibility = if (history.isNotEmpty()) View.VISIBLE else View.GONE
+                }
+            }
+        }
+    }
+
+
     private fun setupListeners() {
         retryButton.setOnClickListener {
-            searchViewModel.viewModelScope.launch {
+            lifecycleScope.launch {
                 startProgressBarAnimation()
-                searchViewModel.searchTracks(query = searchEditText.text.toString().trim())
+                searchViewModel.updateQuery(searchEditText.text.toString().trim())
             }
         }
 
         trackAdapter.setOnTrackClickListener { track ->
             searchViewModel.addToSearchHistory(track)
+            searchEditText.setText(track.trackName)
+            searchEditText.setSelection(track.trackName.length)
+
             val intent = Intent(this, PlayerActivity::class.java)
             intent.putExtra("track", track)
             startActivity(intent)
         }
+
         clearHistoryButton.setOnClickListener {
             searchViewModel.clearHistory()
+            searchHistoryTitle.visibility = View.GONE
             clearHistoryButton.visibility = View.GONE
+            recyclerView.visibility = View.GONE
         }
 
         clearButton.setOnClickListener {
             searchEditText.text.clear()
-            searchViewModel.loadSearchHistory()
+            searchViewModel.loadSearchHistory() // Загружаем историю поиска
             hideError()
+
+            // Показываем заголовок "Вы искали" и кнопку "Очистить историю"
+            searchHistoryTitle.visibility = View.VISIBLE
+            clearHistoryButton.visibility = View.VISIBLE
+            recyclerView.visibility = View.VISIBLE
         }
+
+
 
         searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -109,59 +151,36 @@ class SearchActivity : AppCompatActivity() {
                     searchHistoryTitle.visibility = View.GONE
                     clearHistoryButton.visibility = View.GONE
                     recyclerView.visibility = View.GONE
-                    startProgressBarAnimation()
 
-                    searchViewModel.viewModelScope.launch {
-                        kotlinx.coroutines.delay(2000)
-                        searchViewModel.searchTracks(query = s.toString().trim())
-                    }
+                    searchViewModel.updateQuery(s.toString().trim()) // Просто обновляем query
+
                 } else {
                     searchViewModel.loadSearchHistory()
                     hideError()
                 }
             }
 
-
             override fun afterTextChanged(s: Editable?) {}
         })
+
     }
 
-    private fun setupObservers() {
-        searchViewModel.searchResults.observe(this) { tracks ->
-            trackAdapter.updateTracks(tracks)
-            recyclerView.visibility = if (tracks.isNotEmpty()) View.VISIBLE else View.GONE
-            stopProgressBarAnimation()
-
-            // Если ошибка уже установлена, не сбрасываем ее
-            if (tracks.isEmpty() && searchViewModel.errorType.value == null) {
-                showError("no_results")
-            } else {
-                hideError()
-            }
-        }
-
-        searchViewModel.errorType.observe(this) { error ->
-            error?.let { showError(it) } ?: hideError()
-        }
-
-        searchViewModel.searchHistory.observe(this) { history ->
-            trackAdapter.updateTracks(history)
-            clearHistoryButton.visibility = if (history.isNotEmpty()) View.VISIBLE else View.GONE
-            searchHistoryTitle.visibility = if (history.isNotEmpty()) View.VISIBLE else View.GONE
-            recyclerView.visibility = if (history.isNotEmpty()) View.VISIBLE else View.GONE
-        }
-    }
-
-    private fun stopProgressBarAnimation() {
+        private fun stopProgressBarAnimation() {
         progressBar.visibility = View.GONE
     }
 
     private fun startProgressBarAnimation() {
-        progressBar.visibility = View.VISIBLE // Показываем прогресс-бар перед анимацией
+        progressBar.visibility = View.VISIBLE
         val animator = ObjectAnimator.ofFloat(progressBar, "rotation", 0f, 360f)
         animator.duration = 1000
         animator.repeatCount = ObjectAnimator.INFINITE
         animator.start()
+    }
+
+    private fun hideHistory() {
+        searchHistoryTitle.visibility = View.GONE
+        clearHistoryButton.visibility = View.GONE
+        recyclerView.visibility = View.GONE
     }
 
     private fun showError(errorType: String) {
@@ -172,22 +191,31 @@ class SearchActivity : AppCompatActivity() {
                 errorIcon.visibility = View.VISIBLE
                 errorText.visibility = View.VISIBLE
                 retryButton.visibility = View.VISIBLE
+
+                // Скрываем ненужные элементы
                 errorIconNoResults.visibility = View.GONE
                 errorTextNoResults.visibility = View.GONE
+                recyclerView.visibility = View.GONE
+                searchHistoryTitle.visibility = View.GONE
+                clearHistoryButton.visibility = View.GONE
             }
             "no_results" -> {
                 errorIconNoResults.setImageResource(R.drawable.error)
                 errorTextNoResults.text = getString(R.string.no_results_text)
                 errorIconNoResults.visibility = View.VISIBLE
                 errorTextNoResults.visibility = View.VISIBLE
+
+                // Показываем ошибку, но скрываем другие элементы
                 retryButton.visibility = View.GONE
+                recyclerView.visibility = View.GONE
+                searchHistoryTitle.visibility = View.GONE
+                clearHistoryButton.visibility = View.GONE
                 errorIcon.visibility = View.GONE
                 errorText.visibility = View.GONE
             }
         }
-        recyclerView.visibility = View.GONE
-        clearHistoryButton.visibility = View.GONE
     }
+
 
     private fun hideError() {
         errorIcon.visibility = View.GONE

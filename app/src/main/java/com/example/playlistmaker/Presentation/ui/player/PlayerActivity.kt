@@ -11,7 +11,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
-import com.example.playlistmaker.Creator
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.models.Track
 import org.koin.androidx.viewmodel.ext.android.viewModel
