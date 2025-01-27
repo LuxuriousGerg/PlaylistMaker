@@ -117,19 +117,19 @@ class SearchViewModel(
     }
     fun addToSearchHistory(track: Track) {
         val updatedList = _searchHistory.value.toMutableList()
-
-        // Удаляем трек из списка, если он уже там есть (чтобы не было дублей)
+        // Удаляем, если трек уже есть, чтобы не было дублей
         updatedList.remove(track)
-
-        updatedList.add(0, track) // Добавляем в начало списка
-
-        if (updatedList.size > 10) { // Ограничение на 10 последних записей
-            updatedList.removeAt(updatedList.size - 1)
+        // Добавляем в начало
+        updatedList.add(0, track)
+        // Ограничиваем размер (например, 10)
+        if (updatedList.size > 10) {
+            updatedList.removeLast()
         }
-
+        // Сохраняем
         saveSearchHistory(updatedList)
         _searchHistory.value = updatedList
     }
+
 
 
     fun clearHistory() {

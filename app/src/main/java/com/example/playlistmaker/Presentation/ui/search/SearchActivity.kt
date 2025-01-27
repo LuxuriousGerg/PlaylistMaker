@@ -82,7 +82,15 @@ class SearchActivity : AppCompatActivity() {
             }.collect { (tracks, error, history) ->
                 stopProgressBarAnimation() // Останавливаем анимацию загрузки
 
-                if (tracks.isNotEmpty()) {
+                if (searchEditText.text.isEmpty()) {
+                    // Сначала проверяем, что поле пустое — показываем историю
+                    trackAdapter.updateTracks(history)
+                    searchHistoryTitle.visibility = if (history.isNotEmpty()) View.VISIBLE else View.GONE
+                    clearHistoryButton.visibility = if (history.isNotEmpty()) View.VISIBLE else View.GONE
+                    recyclerView.visibility = if (history.isNotEmpty()) View.VISIBLE else View.GONE
+                    hideError()
+                } else if (tracks.isNotEmpty()) {
+                    // Тогда только если поле не пустое, показываем результаты поиска
                     trackAdapter.updateTracks(tracks)
                     recyclerView.visibility = View.VISIBLE
                     hideError()
@@ -91,12 +99,6 @@ class SearchActivity : AppCompatActivity() {
                     showError("no_results")
                 } else if (error != null) {
                     showError(error)
-                } else if (searchEditText.text.isEmpty()) {
-                    // Если в поиске ничего нет, показываем историю
-                    trackAdapter.updateTracks(history)
-                    searchHistoryTitle.visibility = if (history.isNotEmpty()) View.VISIBLE else View.GONE
-                    clearHistoryButton.visibility = if (history.isNotEmpty()) View.VISIBLE else View.GONE
-                    recyclerView.visibility = if (history.isNotEmpty()) View.VISIBLE else View.GONE
                 }
             }
         }
@@ -113,13 +115,12 @@ class SearchActivity : AppCompatActivity() {
 
         trackAdapter.setOnTrackClickListener { track ->
             searchViewModel.addToSearchHistory(track)
-            searchEditText.setText(track.trackName)
-            searchEditText.setSelection(track.trackName.length)
-
-            val intent = Intent(this, PlayerActivity::class.java)
-            intent.putExtra("track", track)
+            val intent = Intent(this, PlayerActivity::class.java).apply {
+                putExtra("track", track)
+            }
             startActivity(intent)
         }
+
 
         clearHistoryButton.setOnClickListener {
             searchViewModel.clearHistory()
@@ -130,16 +131,9 @@ class SearchActivity : AppCompatActivity() {
 
         clearButton.setOnClickListener {
             searchEditText.text.clear()
-            searchViewModel.loadSearchHistory() // Загружаем историю поиска
+            searchViewModel.updateQuery("")
             hideError()
-
-            // Показываем заголовок "Вы искали" и кнопку "Очистить историю"
-            searchHistoryTitle.visibility = View.VISIBLE
-            clearHistoryButton.visibility = View.VISIBLE
-            recyclerView.visibility = View.VISIBLE
         }
-
-
 
         searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}

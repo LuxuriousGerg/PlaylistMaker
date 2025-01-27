@@ -19,7 +19,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 val dataModule: Module = module {
     single { Gson() }
-    single { MediaPlayer() } // Теперь передаём MediaPlayer через Koin
+    factory { MediaPlayer() }
 
     single<iTunesApiService> {
         val service = Retrofit.Builder()
@@ -35,7 +35,7 @@ val dataModule: Module = module {
     single<TrackRepository> { TrackRepositoryImpl(get()) }
     single<SettingsRepository> { SettingsRepositoryImpl(get()) }
     single<HistoryRepository> { SearchHistory(get(), get()) }
-    single<PlayerRepository> { PlayerRepositoryImpl(get()) } // Теперь MediaPlayer берётся из Koin
+    factory<PlayerRepository> { PlayerRepositoryImpl(get()) }
 
     single {
         androidContext().getSharedPreferences("playlist_prefs", android.content.Context.MODE_PRIVATE)
