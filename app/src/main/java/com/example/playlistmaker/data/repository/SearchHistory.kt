@@ -7,9 +7,11 @@ import com.example.playlistmaker.domain.repository.HistoryRepository
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-class SearchHistory(private val sharedPreferences: SharedPreferences) : HistoryRepository {
+class SearchHistory(
+    private val sharedPreferences: SharedPreferences,
+    private val gson: Gson // Теперь Gson передается через Koin
+) : HistoryRepository {
 
-    private val gson = Gson()
     private val key = "search_history"
 
     override fun getHistory(): List<Track> {

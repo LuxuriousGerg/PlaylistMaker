@@ -1,5 +1,6 @@
 package com.example.playlistmaker.presentation.ui.search
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,10 +36,12 @@ class TrackAdapter(private val trackList: ArrayList<Track>) :
     override fun getItemCount() = trackList.size
 
     fun updateTracks(newTracks: List<Track>) {
+        Log.d("TrackAdapter", "Обновление списка: ${newTracks.size} треков")
         trackList.clear()
         trackList.addAll(newTracks)
         notifyDataSetChanged()
     }
+
 
     fun setOnTrackClickListener(listener: (Track) -> Unit) {
         onTrackClickListener = listener

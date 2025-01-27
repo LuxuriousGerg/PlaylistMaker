@@ -1,6 +1,6 @@
 package com.example.playlistmaker.data.repository
 
-import com.example.playlistmaker.data.models.TrackDTO
+import com.example.playlistmaker.data.dto.TrackDTO
 import com.example.playlistmaker.data.network.iTunesApiService
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.domain.repository.TrackRepository
