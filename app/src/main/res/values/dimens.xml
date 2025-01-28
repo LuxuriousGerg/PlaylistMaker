@@ -27,4 +27,9 @@
     <dimen name="container_search">52dp</dimen>
     <dimen name="margin_start">10dp</dimen>
     <dimen name="search_start">10dp</dimen>
+    <dimen name="text_title">22sp</dimen>
+    <dimen name="spacing_small">12sp</dimen>
+    <dimen name="media_button">14sp</dimen>
+    <dimen name="text_normal">19sp</dimen>
+    <dimen name="spacing_normal">16sp</dimen>
 </resources>
