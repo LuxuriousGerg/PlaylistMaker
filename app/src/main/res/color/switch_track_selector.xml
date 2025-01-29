@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- track при включенном свитче -->
+    <item android:color="@color/track_checked_light" android:state_checked="true" />
+    <!-- track при выключенном свитче -->
+    <item android:color="@color/track_unchecked_light" />
+</selector>

@@ -14,6 +14,11 @@ class PlaylistFragment : Fragment() {
 
     private val viewModel by viewModel<PlaylistViewModel>()
 
+    companion object {
+        fun newInstance(): PlaylistFragment {
+            return PlaylistFragment()
+        }
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

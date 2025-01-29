@@ -29,24 +29,18 @@ class LibraryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val buttonBack = view.findViewById<ImageButton>(R.id.back_button)
         val tabLayout = view.findViewById<TabLayout>(R.id.tab_layout)
         val viewPager = view.findViewById<ViewPager2>(R.id.view_pager)
+        val buttonBack = view.findViewById<ImageButton>(R.id.back_button)
 
-        // Назад
         buttonBack.setOnClickListener {
             activity?.onBackPressedDispatcher?.onBackPressed()
         }
 
-        // Адаптер с двумя фрагментами
-        val fragments = listOf(
-            FavoritesFragment(),
-            PlaylistFragment()
-        )
-        val adapter = LibraryPagerAdapter(this, fragments)
+        // Теперь адаптер создаём без передачи списка:
+        val adapter = LibraryPagerAdapter(this)
         viewPager.adapter = adapter
 
-        // Привязываем вкладки к ViewPager2
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             when (position) {
                 0 -> tab.text = getString(R.string.favorites_tab_title)

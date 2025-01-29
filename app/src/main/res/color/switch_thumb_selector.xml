@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- thumb при включенном свитче -->
+    <item android:color="@color/thumb_checked_light" android:state_checked="true" />
+    <!-- thumb при выключенном свитче -->
+    <item android:color="@color/thumb_unchecked_light" />
+</selector>

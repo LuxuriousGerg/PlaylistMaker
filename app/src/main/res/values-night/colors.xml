@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primaryColor">#121212</color>
+    <color name="primaryColor">#1A1B22</color>
     <color name="primaryDarkColor">#3700B3</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
@@ -14,4 +14,10 @@
     <color name="search_hint_color">#B0B0B0</color>
     <color name="button_color">#FFFFFF</color>
     <color name="search">#000000</color>
+    <color name="backgroundPrimary">#1A1B22</color>
+    <color name="thumb_unchecked_light">#3772E7</color>
+    <color name="thumb_checked_light">#3772E7</color>
+    <color name="track_unchecked_light">#AEAFB4</color>
+    <color name="track_checked_light">#9FBBF3</color>
+
 </resources>
