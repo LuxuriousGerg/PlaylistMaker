@@ -54,3 +54,8 @@ val viewModelModule: Module = module {
     viewModel { SearchViewModel(get(), get(), get()) }
     viewModel { SettingsViewModel(get()) }
 }
+val app = module {
+    viewModel { FavoritesViewModel() }
+    viewModel { PlaylistViewModel() }
+    viewModel { LibraryViewModel() }
+}

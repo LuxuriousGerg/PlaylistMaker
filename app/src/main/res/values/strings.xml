@@ -25,4 +25,10 @@
     <string name="default_year">-</string>
     <string name="default_genre">-</string>
     <string name="default_country">-</string>
+    <string name="media_library_title">Медиатека</string>
+    <string name="new_playlist_button">Новый плейлист</string>
+    <string name="empty_playlist_text">Вы не создали\nни одного плейлиста</string>
+    <string name="empty_favorites_text">Ваша библиотека пуста</string>
+    <string name="favorites_tab_title">Избранные треки</string>
+    <string name="playlists_tab_title">Плейлисты</string>
 </resources>
