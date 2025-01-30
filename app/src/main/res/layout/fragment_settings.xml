@@ -14,8 +14,6 @@ android:padding="0dp"
         android:layout_height="wrap_content"
         android:title="@string/settings_title"
         android:titleTextAppearance="@style/ToolbarTitleText"
-        app:navigationIcon="@drawable/arrow"
-        app:navigationIconTint="@color/arrow"
         app:titleTextColor="@color/buttonText2" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial

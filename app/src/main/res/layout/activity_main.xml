@@ -1,56 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@color/primaryColor">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView_title"
+    <!-- Контейнер, где будут меняться фрагменты -->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph" />
+
+    <!-- BottomNavigationView -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/TitleTextStyle"
-        android:text="@string/app_name"
-        android:gravity="left"
-        android:fontFamily="@font/ys_display_medium"/>
+        android:layout_gravity="bottom"
+        app:menu="@menu/bottom_nav_menu"
+        app:itemIconTint="@color/bottom_nav_item_color"
+        app:itemTextColor="@color/bottom_nav_item_color"/>
 
-    <Button
-        android:id="@+id/button_search"
-        style="@style/BaseButtonStyle"
-        android:drawableStart="@drawable/lupa"
-        android:text="@string/search"
-        app:cornerRadius="@dimen/button_corner_radius"
-        app:iconGravity="textStart"
-        app:icon="@drawable/lupa"
-        app:iconPadding="@dimen/button_icon_padding"
-        app:iconTint="@color/black"
-        android:textAllCaps="false"/>
-
-    <Button
-        android:id="@+id/button_library"
-        style="@style/BaseButtonStyle"
-        android:drawableStart="@drawable/music_xml"
-        android:text="@string/library"
-        android:layout_marginTop="@dimen/button_margin_top"
-        app:cornerRadius="@dimen/button_corner_radius"
-        app:iconGravity="textStart"
-        app:icon="@drawable/music_xml"
-        app:iconPadding="@dimen/button_icon_padding"
-        app:iconTint="@color/black"
-        android:textAllCaps="false"/>
-
-    <Button
-        android:id="@+id/button_settings"
-        style="@style/BaseButtonStyle"
-        android:drawableStart="@drawable/light_mode"
-        android:text="@string/settings"
-        android:layout_marginTop="@dimen/button_margin_top"
-        app:cornerRadius="@dimen/button_corner_radius"
-        app:icon="@drawable/light_mode"
-        app:iconGravity="textStart"
-        app:iconPadding="@dimen/button_icon_padding"
-        app:iconTint="@color/black"
-        android:textAllCaps="false"/>
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

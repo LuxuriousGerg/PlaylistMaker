@@ -38,8 +38,10 @@ android {
     }
 
 }
+val ui_version = "2.8.6"
 val fragment_version = "1.8.3"
 dependencies {
+    implementation("androidx.navigation:navigation-ui-ktx:$ui_version")
     implementation("androidx.fragment:fragment-ktx:$fragment_version")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -47,6 +49,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.preference.ktx)
+    implementation(libs.androidx.navigation.fragment.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

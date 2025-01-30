@@ -31,11 +31,6 @@ class LibraryFragment : Fragment() {
 
         val tabLayout = view.findViewById<TabLayout>(R.id.tab_layout)
         val viewPager = view.findViewById<ViewPager2>(R.id.view_pager)
-        val buttonBack = view.findViewById<ImageButton>(R.id.back_button)
-
-        buttonBack.setOnClickListener {
-            activity?.onBackPressedDispatcher?.onBackPressed()
-        }
 
         // Теперь адаптер создаём без передачи списка:
         val adapter = LibraryPagerAdapter(this)

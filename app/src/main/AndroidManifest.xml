@@ -42,25 +42,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
         tools:targetApi="31">
-    <activity
+        <!-- Главный экран приложения -->
+        <activity
             android:name=".presentation.ui.main.MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan">
 
-                <category android:name="android.intent.category.LAUNCHER" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
         <activity
-            android:name=".presentation.ui.search.SearchActivity"
-            android:exported="true" />
-        <activity
-            android:name=".presentation.ui.library.LibraryActivity"
-            android:exported="true" />
-        <activity
-            android:name=".presentation.ui.settings.SettingsActivity"
-            android:exported="true" />
-        <activity android:name=".presentation.ui.player.PlayerActivity" />
+            android:name=".presentation.ui.player.PlayerActivity"
+            android:exported="false"/>
 
     </application>
 
