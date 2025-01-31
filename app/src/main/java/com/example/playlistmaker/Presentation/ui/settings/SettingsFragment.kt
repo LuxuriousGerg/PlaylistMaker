@@ -8,17 +8,17 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.example.playlistmaker.R
+import com.example.playlistmaker.databinding.FragmentSettingsBinding
 import com.example.playlistmaker.presentation.viewmodel.SettingsViewModel
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.switchmaterial.SwitchMaterial
-import com.google.android.material.textview.MaterialTextView
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsFragment : Fragment() {
 
     private val settingsViewModel: SettingsViewModel by viewModel()
 
-    private lateinit var themeSwitcher: SwitchMaterial
+    // храним ссылку на binding
+    private var _binding: FragmentSettingsBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,32 +26,29 @@ class SettingsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        return inflater.inflate(R.layout.fragment_settings, container, false)
+        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        return binding.root
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupUI(view)
+        setupUI()
         setupObservers()
-        setupListeners(view)
+        setupListeners()
     }
 
-    private fun setupUI(view: View) {
-
-        val toolbar: MaterialToolbar = view.findViewById(R.id.toolbar)
+    private fun setupUI() {
+        val toolbar = binding.toolbar
         toolbar.title = getString(R.string.settings_title)
         toolbar.navigationIcon = null
-
-        // SwitchMaterial
-        themeSwitcher = view.findViewById(R.id.switch_theme)
     }
 
     private fun setupObservers() {
         // Подписываемся на LiveData через viewLifecycleOwner
         settingsViewModel.isDarkThemeEnabled.observe(viewLifecycleOwner, Observer { isDarkMode ->
-            themeSwitcher.isChecked = isDarkMode
+            // Прямой доступ к switchTheme
+            binding.switchTheme.isChecked = isDarkMode
         })
 
         settingsViewModel.shareAppEvent.observe(viewLifecycleOwner, Observer { intent ->
@@ -67,29 +64,35 @@ class SettingsFragment : Fragment() {
         })
     }
 
-    private fun setupListeners(view: View) {
+    private fun setupListeners() {
         // Переключатель темы
-        themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
+        binding.switchTheme.setOnCheckedChangeListener { _, isChecked ->
             settingsViewModel.toggleTheme(isChecked)
         }
 
         // Кнопка «Поделиться приложением»
-        view.findViewById<MaterialTextView>(R.id.textView_share_app).setOnClickListener {
+        binding.textViewShareApp.setOnClickListener {
             settingsViewModel.shareApp(getString(R.string.share_message))
         }
 
         // Кнопка «Написать в поддержку»
-        view.findViewById<MaterialTextView>(R.id.textView_support).setOnClickListener {
+        binding.textViewSupport.setOnClickListener {
             settingsViewModel.writeToSupport(
-                email = "support@example.com",
+                email = getString(R.string.extra_email),
                 subject = getString(R.string.support_subject),
                 message = getString(R.string.support_email)
             )
         }
 
         // Кнопка «Пользовательское соглашение»
-        view.findViewById<MaterialTextView>(R.id.textView_terms).setOnClickListener {
+        binding.textViewTerms.setOnClickListener {
             settingsViewModel.openUserAgreement(getString(R.string.terms_url))
         }
+    }
+
+    // обнуляем binding, чтобы избежать утечек
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

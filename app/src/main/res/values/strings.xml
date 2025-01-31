@@ -10,6 +10,7 @@
     <string name="terms_of_use">Пользовательское соглашение</string>
     <string name="share_message">Ознакомьтесь с этим курсом по разработке Android на Practicum!</string>
     <string name="support_email">Почта поддержки</string>
+    <string name="extra_email">support@example.com</string>
     <string name="support_subject">Сообщение разработчикам Playlist Maker</string>
     <string name="terms_url">https://yandex.ru/legal/practicum_offer/</string>
     <string name="search_hint">Поиск</string>

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/library_fragment">
+    app:startDestination="@id/search_fragment">
 
     <fragment
         android:id="@+id/library_fragment"
