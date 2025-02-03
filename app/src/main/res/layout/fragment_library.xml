@@ -32,7 +32,10 @@
         app:tabGravity="fill"
         app:tabMode="fixed"
         app:tabIndicatorColor="@color/button_color"
-        app:tabIndicatorHeight="2dp" />
+        app:tabIndicatorHeight="2dp"
+        android:background="@color/backgroundPrimary"
+        app:tabTextAppearance="@style/TabTextStyle" />
+
 
     <!-- ViewPager2 для фрагментов -->
     <androidx.viewpager2.widget.ViewPager2
