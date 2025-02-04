@@ -14,17 +14,6 @@
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <ImageButton
-            android:id="@+id/back_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="2dp"
-            android:background="@null"
-            android:src="@drawable/arrow"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:tint="@color/arrow" />
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -43,7 +32,10 @@
         app:tabGravity="fill"
         app:tabMode="fixed"
         app:tabIndicatorColor="@color/button_color"
-        app:tabIndicatorHeight="2dp" />
+        app:tabIndicatorHeight="2dp"
+        android:background="@color/backgroundPrimary"
+        app:tabTextAppearance="@style/TabTextStyle" />
+
 
     <!-- ViewPager2 для фрагментов -->
     <androidx.viewpager2.widget.ViewPager2

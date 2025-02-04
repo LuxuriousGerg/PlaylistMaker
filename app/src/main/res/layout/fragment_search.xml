@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.ui.search.SearchActivity"
+    tools:context=".presentation.ui.search.SearchFragment"
     android:background="@color/backgroundPrimary">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -21,7 +21,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:navigationIcon="@drawable/arrow"
             app:navigationIconTint="@color/arrow"
             app:titleTextColor="@color/buttonText2" />
 

@@ -19,7 +19,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    buildFeatures {
+        viewBinding = true
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -38,15 +40,17 @@ android {
     }
 
 }
-val fragment_version = "1.8.3"
+
 dependencies {
-    implementation("androidx.fragment:fragment-ktx:$fragment_version")
+    implementation(libs.navigation.ui.ktx)
+    implementation(libs.fragment.ktx)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.preference.ktx)
+    implementation(libs.androidx.navigation.fragment.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
