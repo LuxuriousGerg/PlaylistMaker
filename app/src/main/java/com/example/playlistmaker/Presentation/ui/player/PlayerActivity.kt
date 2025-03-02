@@ -3,17 +3,38 @@ package com.example.playlistmaker.presentation.ui.player
 import PlayerViewModel
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.models.Track
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+
+// Функция-расширение для установки обработчика кликов с debounce
+fun View.setDebouncedOnClickListener(
+    delayMs: Long = 300L,
+    coroutineScope: CoroutineScope,
+    action: () -> Unit
+) {
+    var debounceJob: Job? = null
+    setOnClickListener {
+        debounceJob?.cancel()
+        debounceJob = coroutineScope.launch {
+            delay(delayMs)
+            action()
+        }
+    }
+}
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var trackTitle: TextView
@@ -66,9 +87,16 @@ class PlayerActivity : AppCompatActivity() {
         artistName.isSelected = true
         findViewById<TextView>(R.id.info_album_value).isSelected = true
 
-        backButton.setOnClickListener { finish() }
-        playButton.setOnClickListener { playerViewModel.togglePlayback() }
-        pauseButton.setOnClickListener { playerViewModel.togglePlayback() }
+        backButton.setOnClickListener {
+            finish()
+        }
+        // Используем debounced обработчик кликов для переключения воспроизведения
+        playButton.setDebouncedOnClickListener(delayMs = 300L, coroutineScope = lifecycleScope) {
+            playerViewModel.togglePlayback()
+        }
+        pauseButton.setDebouncedOnClickListener(delayMs = 300L, coroutineScope = lifecycleScope) {
+            playerViewModel.togglePlayback()
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -93,5 +121,4 @@ class PlayerActivity : AppCompatActivity() {
             currentTimeTextView.text = time
         }
     }
-
 }
