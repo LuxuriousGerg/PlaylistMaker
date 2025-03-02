@@ -28,11 +28,9 @@ fun View.setDebouncedOnClickListener(
 ) {
     var debounceJob: Job? = null
     setOnClickListener {
-        Log.d("Debounce", "Click detected on view: $this")
         debounceJob?.cancel()
         debounceJob = coroutineScope.launch {
             delay(delayMs)
-            Log.d("Debounce", "Debounced action executed on view: $this")
             action()
         }
     }
@@ -51,7 +49,6 @@ class PlayerActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("PlayerActivity", "onCreate started")
         setContentView(R.layout.audio_player)
 
         setupUI()
@@ -59,11 +56,9 @@ class PlayerActivity : AppCompatActivity() {
 
         val track = intent.getParcelableExtra("track", Track::class.java)
         track?.let {
-            Log.d("PlayerActivity", "Track received: ${it.trackName}")
             trackTitle.text = it.trackName
             artistName.text = it.artistName
             it.previewUrl?.let { url ->
-                Log.d("PlayerActivity", "Calling preparePlayer with url: $url")
                 playerViewModel.preparePlayer(url)
             }
 
@@ -78,11 +73,9 @@ class PlayerActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.info_country_value).text = it.country ?: "Unknown Country"
             findViewById<TextView>(R.id.info_duration_value).text = it.formatTrackTime(it.trackTimeMillis)
         }
-        Log.d("PlayerActivity", "onCreate finished")
     }
 
     private fun setupUI() {
-        Log.d("PlayerActivity", "setupUI started")
         trackTitle = findViewById(R.id.track_title)
         artistName = findViewById(R.id.artist_name)
         playButton = findViewById(R.id.play)
@@ -95,24 +88,19 @@ class PlayerActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.info_album_value).isSelected = true
 
         backButton.setOnClickListener {
-            Log.d("PlayerActivity", "Back button clicked")
             finish()
         }
         // Используем debounced обработчик кликов для переключения воспроизведения
         playButton.setDebouncedOnClickListener(delayMs = 300L, coroutineScope = lifecycleScope) {
-            Log.d("PlayerActivity", "Play button debounced click action")
             playerViewModel.togglePlayback()
         }
         pauseButton.setDebouncedOnClickListener(delayMs = 300L, coroutineScope = lifecycleScope) {
-            Log.d("PlayerActivity", "Pause button debounced click action")
             playerViewModel.togglePlayback()
         }
-        Log.d("PlayerActivity", "setupUI finished")
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun setupObservers() {
-        Log.d("PlayerActivity", "setupObservers started")
         val track: Track? = intent.getParcelableExtra("track", Track::class.java)
 
         track?.let {
@@ -125,15 +113,12 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         playerViewModel.isPlaying.observe(this) { isPlaying ->
-            Log.d("PlayerActivity", "isPlaying observer: isPlaying = $isPlaying")
             playButton.visibility = if (isPlaying) View.GONE else View.VISIBLE
             pauseButton.visibility = if (isPlaying) View.VISIBLE else View.GONE
         }
 
         playerViewModel.currentTime.observe(this) { time ->
-            Log.d("PlayerActivity", "currentTime observer: time = $time")
             currentTimeTextView.text = time
         }
-        Log.d("PlayerActivity", "setupObservers finished")
     }
 }

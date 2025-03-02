@@ -20,13 +20,10 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewMode
     private var updateTimeJob: Job? = null
 
     fun preparePlayer(url: String) {
-        Log.d("PlayerViewModel", "preparePlayer called with URL: $url")
         playerInteractor.preparePlayer(url, onPrepared = {
-            Log.d("PlayerViewModel", "Player prepared")
             _isPlaying.postValue(false)
             _currentTime.postValue("00:00")
         }, onCompletion = {
-            Log.d("PlayerViewModel", "Playback completed")
             _isPlaying.postValue(false)
             _currentTime.postValue("00:00")
             updateTimeJob?.cancel() // Останавливаем обновление времени при завершении воспроизведения
@@ -48,22 +45,17 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewMode
     }
 
     private fun startUpdatingTime() {
-        Log.d("PlayerViewModel", "startUpdatingTime: Cancelling previous job if exists")
         updateTimeJob?.cancel()
         updateTimeJob = viewModelScope.launch {
-            Log.d("PlayerViewModel", "startUpdatingTime: Update job started")
             while (isActive && (_isPlaying.value ?: false)) {
                 val currentPosition = playerInteractor.getCurrentPosition().toLong()
                 _currentTime.value = formatTrackTime(currentPosition)
-                Log.d("PlayerViewModel", "Current position: $currentPosition ms")
                 delay(300L)
             }
-            Log.d("PlayerViewModel", "startUpdatingTime: Update job ended")
         }
     }
 
     override fun onCleared() {
-        Log.d("PlayerViewModel", "onCleared: Cancelling updateTimeJob and releasing player")
         updateTimeJob?.cancel()
         playerInteractor.release()
         super.onCleared()
