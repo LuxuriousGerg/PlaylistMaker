@@ -4,6 +4,8 @@ import PlayerViewModel
 import SearchViewModel
 import android.media.MediaPlayer
 import android.util.Log
+import androidx.room.Room
+import com.example.playlistmaker.data.db.AppDatabase
 import com.example.playlistmaker.data.network.iTunesApiService
 import com.example.playlistmaker.data.repository.*
 import com.example.playlistmaker.domain.interactors.*
@@ -20,16 +22,12 @@ import retrofit2.converter.gson.GsonConverterFactory
 val dataModule: Module = module {
     single { Gson() }
     factory { MediaPlayer() }
-
     single<iTunesApiService> {
-        val service = Retrofit.Builder()
+        Retrofit.Builder()
             .baseUrl("https://itunes.apple.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(iTunesApiService::class.java)
-
-        Log.d("DI", "Создан iTunesApiService: $service")
-        service
     }
 
     single<TrackRepository> { TrackRepositoryImpl(get()) }
@@ -43,7 +41,7 @@ val dataModule: Module = module {
 }
 
 val domainModule: Module = module {
-    factory<SearchTracksInteractor> { SearchTracksInteractorImpl(get()) }
+    factory<SearchTracksInteractor> { SearchTracksInteractorImpl(get(), get()) }
     factory<SettingsInteractor> { SettingsInteractorImpl(get()) }
     factory<HistoryInteractor> { HistoryInteractorImpl(get()) }
     factory<PlayerInteractor> { PlayerInteractorImpl(get()) }
@@ -54,8 +52,8 @@ val viewModelModule: Module = module {
     viewModel { SearchViewModel(get(), get(), get()) }
     viewModel { SettingsViewModel(get()) }
 }
-val app = module {
-    viewModel { FavoritesViewModel() }
+// Отдельный модуль для пустых ViewModel
+val libraryModule = module {
     viewModel { PlaylistViewModel() }
     viewModel { LibraryViewModel() }
 }

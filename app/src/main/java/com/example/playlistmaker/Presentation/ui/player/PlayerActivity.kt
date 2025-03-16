@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.presentation.viewmodel.FavoritesViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -44,7 +45,15 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var backButton: ImageButton
     private lateinit var currentTimeTextView: TextView
 
+    // Кнопки для состояния "Нравится"
+    private lateinit var likeButton: ImageView
+    private lateinit var likePressedButton: ImageView
+    // Храним текущий трек
+    private lateinit var currentTrack: Track
+
     private val playerViewModel: PlayerViewModel by viewModel()
+    // Внедряем FavoritesViewModel для работы с избранным
+    private val favoritesViewModel: FavoritesViewModel by viewModel()
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,8 +63,14 @@ class PlayerActivity : AppCompatActivity() {
         setupUI()
         setupObservers()
 
+        // Инициализируем кнопки "Нравится"
+        likeButton = findViewById(R.id.like)
+        likePressedButton = findViewById(R.id.like_pressed)
+
+        // Получаем трек из intent
         val track = intent.getParcelableExtra("track", Track::class.java)
         track?.let {
+            currentTrack = it
             trackTitle.text = it.trackName
             artistName.text = it.artistName
             it.previewUrl?.let { url ->
@@ -72,7 +87,33 @@ class PlayerActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.info_genre_value).text = it.primaryGenreName ?: "Unknown Genre"
             findViewById<TextView>(R.id.info_country_value).text = it.country ?: "Unknown Country"
             findViewById<TextView>(R.id.info_duration_value).text = it.formatTrackTime(it.trackTimeMillis)
+
+            // Устанавливаем начальное состояние кнопки "Нравится"
+            updateFavoriteButton()
         }
+
+        // Назначаем обработчики кликов для обеих кнопок (выбранное и не выбранное состояние)
+        likeButton.setOnClickListener { toggleFavorite() }
+        likePressedButton.setOnClickListener { toggleFavorite() }
+    }
+
+    // Обновляет видимость кнопок в зависимости от флага isFavorite
+    private fun updateFavoriteButton() {
+        if (currentTrack.isFavorite) {
+            likeButton.visibility = View.GONE
+            likePressedButton.visibility = View.VISIBLE
+        } else {
+            likeButton.visibility = View.VISIBLE
+            likePressedButton.visibility = View.GONE
+        }
+    }
+
+    // Переключает состояние избранного для текущего трека
+    private fun toggleFavorite() {
+        favoritesViewModel.toggleFavorite(currentTrack)
+        // Переключаем локальное состояние и обновляем UI
+        currentTrack.isFavorite = !currentTrack.isFavorite
+        updateFavoriteButton()
     }
 
     private fun setupUI() {

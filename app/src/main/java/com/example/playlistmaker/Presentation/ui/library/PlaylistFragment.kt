@@ -19,6 +19,7 @@ class PlaylistFragment : Fragment() {
             return PlaylistFragment()
         }
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

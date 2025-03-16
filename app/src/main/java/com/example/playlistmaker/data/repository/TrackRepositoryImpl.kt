@@ -32,6 +32,7 @@ class TrackRepositoryImpl(private val apiService: iTunesApiService) : TrackRepos
 
     private fun mapToDomain(dto: TrackDTO): Track {
         return Track(
+            trackId = dto.trackId ?: 0L,
             trackName = dto.trackName ?: "Unknown Track",
             artistName = dto.artistName ?: "Unknown Artist",
             trackTimeMillis = dto.trackTimeMillis,
