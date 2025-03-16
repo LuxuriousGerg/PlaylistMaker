@@ -3,6 +3,7 @@ package com.example.playlistmaker.domain.models
 import java.io.Serializable
 
 data class Track(
+    val trackId: Long,          // ID
     val trackName: String,      // Название композиции
     val artistName: String,     // Имя исполнителя
     val trackTimeMillis: Long,  // Продолжительность трека
@@ -11,7 +12,8 @@ data class Track(
     val releaseDate: String,    // Год выпуска
     val primaryGenreName: String, // Жанр
     val country: String,        // Страна
-    val previewUrl: String?
+    val previewUrl: String?,
+    var isFavorite: Boolean = false   // Флаг избранного
 ) : Serializable {
 
     fun getReleaseYear(): String {

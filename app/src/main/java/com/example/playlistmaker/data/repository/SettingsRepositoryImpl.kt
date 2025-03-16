@@ -10,12 +10,10 @@ class SettingsRepositoryImpl(private val sharedPreferences: SharedPreferences) :
 
     override fun isDarkThemeEnabled(): Boolean {
         val value = sharedPreferences.getBoolean(themeKey, false)
-        Log.d("SettingsRepository", "Получено значение темы: $value")
         return value
     }
 
     override fun setDarkThemeEnabled(enabled: Boolean) {
-        Log.d("SettingsRepository", "Запись темы: $enabled")
         sharedPreferences.edit().putBoolean(themeKey, enabled).apply()
     }
 }

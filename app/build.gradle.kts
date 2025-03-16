@@ -1,8 +1,9 @@
-import org.jetbrains.kotlin.storage.CacheResetOnProcessCanceled.enabled
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("kotlin-kapt")
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -42,6 +43,9 @@ android {
 }
 
 dependencies {
+    val room_version = "2.6.1"
+    implementation ("androidx.room:room-runtime:$room_version")
+    ksp ("androidx.room:room-compiler:$room_version")
     implementation(libs.navigation.ui.ktx)
     implementation(libs.fragment.ktx)
     implementation(libs.androidx.core.ktx)
@@ -60,4 +64,8 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.koin.android)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
 }

@@ -42,6 +42,7 @@ class SearchHistory(
 
     private fun mapToDomain(dto: HistoryTrackDTO): Track {
         return Track(
+            trackId = 1,
             trackName = dto.trackName,
             artistName = dto.artistName,
             trackTimeMillis = dto.trackTimeMillis,
@@ -50,7 +51,8 @@ class SearchHistory(
             releaseDate = dto.releaseDate,
             primaryGenreName = dto.primaryGenreName,
             country = dto.country,
-            previewUrl = dto.previewUrl
+            previewUrl = dto.previewUrl,
+            isFavorite = false
         )
     }
 
