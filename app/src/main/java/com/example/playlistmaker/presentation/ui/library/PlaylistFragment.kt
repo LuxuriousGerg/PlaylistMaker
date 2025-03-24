@@ -44,12 +44,10 @@ class PlaylistFragment : Fragment() {
         tvEmpty = view.findViewById(R.id.tvEmpty)
         val newPlaylistButton = view.findViewById<Button>(R.id.button_new_playlist)
 
-        // Настраиваем RecyclerView
         rvPlaylists.layoutManager = GridLayoutManager(requireContext(), 2)
         adapter = PlaylistAdapter()
         rvPlaylists.adapter = adapter
 
-        // Подписываемся на Flow из ViewModel
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.playlistsFlow.collect { playlistList ->
                 if (playlistList.isEmpty()) {

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 
 class PlaylistRepository(
     private val playlistDao: PlaylistDao,
-    private val playlistTrackDao: PlaylistTrackDao // <-- новый параметр
+    private val playlistTrackDao: PlaylistTrackDao
 ) {
 
     suspend fun createPlaylist(name: String, description: String?, coverFilePath: String?) {
@@ -44,14 +44,13 @@ class PlaylistRepository(
             // трек уже добавлен
             false
         } else {
-            // Добавляем идентификатор трека в JSON-список
             currentList.add(track.trackId.toString())
             val updatedJson = Gson().toJson(currentList)
             val updatedPlaylist = playlistEntity.copy(
                 trackIdsJson = updatedJson,
                 trackCount = playlistEntity.trackCount + 1
             )
-            // Обновляем плейлист в базе
+
             playlistDao.updatePlaylist(updatedPlaylist)
 
             // Преобразуем Track в PlaylistTrackEntity и сохраняем его

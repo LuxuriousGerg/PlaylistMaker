@@ -11,7 +11,6 @@ interface FavoriteTrackDao {
     @Delete
     suspend fun deleteTrack(track: FavoriteTrackEntity)
 
-    // Сортируем по убыванию addedAt, чтобы последние добавленные были сверху
     @Query("SELECT * FROM favorite_tracks ORDER BY addedAt DESC")
     fun getAllFavorites(): Flow<List<FavoriteTrackEntity>>
 

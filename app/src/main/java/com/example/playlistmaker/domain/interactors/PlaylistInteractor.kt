@@ -23,7 +23,6 @@ class PlaylistInteractor(
         repository.createPlaylist(name, description, coverFilePath)
     }
 
-    // Новый метод для получения плейлистов
     fun observeAllPlaylists(): Flow<List<Playlist>> {
         return repository.getAllPlaylists()
             .map { list -> list.map { it.toDomain() } }

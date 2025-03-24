@@ -90,7 +90,6 @@ class PlayerActivity : AppCompatActivity() {
             }
         })
 
-        // Получаем трек из интента и инициализируем UI
         val track = intent.getParcelableExtra("track", Track::class.java)
         track?.let {
             currentTrack = it
@@ -131,14 +130,11 @@ class PlayerActivity : AppCompatActivity() {
             finish()
         }
 
-        // Инициализация RecyclerView внутри Bottom Sheet
         val bottomSheetRecyclerView = findViewById<RecyclerView>(R.id.rvPlaylistsBottomSheet)
         bottomSheetRecyclerView.layoutManager = LinearLayoutManager(this)
         bottomSheetAdapter = BottomSheetPlaylistAdapter { playlist ->
-            // При клике по элементу списка вызываем метод добавления трека в выбранный плейлист
             playerViewModel.addTrackToPlaylist(currentTrack, playlist) { message ->
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-                // Скрываем Bottom Sheet после обработки
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             }
         }

@@ -38,7 +38,6 @@ class PlaylistViewModel(
 ) : ViewModel() {
     val playlistsFlow = playlistInteractor.observeAllPlaylists()
 }
-
 class LibraryViewModel : ViewModel() {
     // Логика для экрана "Медиатека"
 }

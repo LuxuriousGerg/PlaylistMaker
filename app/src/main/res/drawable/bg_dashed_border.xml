@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-
-    <!-- Пунктир -->
+    
     <stroke
         android:width="2dp"
         android:color="@android:color/darker_gray"
         android:dashWidth="40dp"
         android:dashGap="40dp" />
 
-    <!-- Скруглённые углы -->
     <corners android:radius="8dp" />
 
-    <!-- Прозрачный фон внутри -->
     <solid android:color="@android:color/transparent"/>
 </shape>

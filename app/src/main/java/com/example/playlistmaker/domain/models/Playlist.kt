@@ -4,6 +4,6 @@ data class Playlist(
     val id: Long,
     val name: String,
     val description: String,
-    val coverUri: String?, // путь к обложке (может быть null)
+    val coverUri: String?,
     val trackCount: Int
 )

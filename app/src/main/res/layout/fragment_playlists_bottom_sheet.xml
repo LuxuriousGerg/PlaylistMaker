@@ -10,7 +10,6 @@
     android:paddingTop="42dp"
     android:background="@drawable/bottom_sheet_bg">
 
-    <!-- Заголовок -->
     <TextView
         android:id="@+id/tvBottomSheetTitle"
         android:layout_width="match_parent"
@@ -33,7 +32,6 @@
         android:textSize="@dimen/media_button"
         android:layout_gravity="center_horizontal"/>
 
-    <!-- Список плейлистов -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPlaylistsBottomSheet"
         android:layout_width="match_parent"

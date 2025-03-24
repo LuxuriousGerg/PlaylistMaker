@@ -53,7 +53,6 @@ class BottomSheetPlaylistAdapter(
                 coverImage.setImageURI(Uri.parse(playlist.coverUri))
             }
 
-            // Клик по всей вьюхе элемента списка
             itemView.setOnClickListener {
                 onPlaylistClick(playlist)
             }

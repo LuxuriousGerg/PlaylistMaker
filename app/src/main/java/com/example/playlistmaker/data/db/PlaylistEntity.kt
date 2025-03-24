@@ -10,9 +10,9 @@ data class PlaylistEntity(
     val id: Long = 0,
     val name: String,
     val description: String,
-    val coverFilePath: String?, // путь к копии обложки во внутреннем хранилище
-    val trackIdsJson: String,   // JSON со списком идентификаторов треков
-    val trackCount: Int         // текущее количество треков в плейлисте
+    val coverFilePath: String?,
+    val trackIdsJson: String,
+    val trackCount: Int
 )
 
 fun PlaylistEntity.toDomain(): Playlist {

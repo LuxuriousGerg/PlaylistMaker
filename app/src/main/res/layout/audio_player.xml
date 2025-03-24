@@ -28,7 +28,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:tint="@color/arrow" />
 
-        <!-- Обложка альбома -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/album_cover"
             android:layout_width="match_parent"
@@ -45,7 +44,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:shapeAppearanceOverlay="@style/RoundedImage" />
 
-        <!-- Название трека -->
         <TextView
             android:id="@+id/track_title"
             android:layout_width="0dp"
@@ -66,7 +64,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Имя исполнителя -->
         <TextView
             android:id="@+id/artist_name"
             android:layout_width="0dp"
@@ -151,7 +148,6 @@
 
         </FrameLayout>
 
-        <!-- Время проигрывания под кнопкой -->
         <TextView
             android:id="@+id/current_time"
             android:layout_width="wrap_content"
@@ -164,7 +160,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:gravity="center" />
 
-        <!-- Длительность -->
         <TextView
             android:id="@+id/info_duration_label"
             android:layout_width="wrap_content"
@@ -188,7 +183,6 @@
             app:layout_constraintTop_toTopOf="@id/info_duration_label"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Альбом -->
         <TextView
             android:id="@+id/info_album_label"
             android:layout_width="wrap_content"
@@ -217,7 +211,6 @@
             app:layout_constraintTop_toTopOf="@id/info_album_label"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Год -->
         <TextView
             android:id="@+id/info_year_label"
             android:layout_width="wrap_content"
@@ -241,7 +234,6 @@
             app:layout_constraintTop_toTopOf="@id/info_year_label"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Жанр -->
         <TextView
             android:id="@+id/info_genre_label"
             android:layout_width="wrap_content"
@@ -265,7 +257,6 @@
             app:layout_constraintTop_toTopOf="@id/info_genre_label"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Страна -->
         <TextView
             android:id="@+id/info_country_label"
             android:layout_width="wrap_content"

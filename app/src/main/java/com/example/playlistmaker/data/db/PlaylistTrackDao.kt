@@ -8,6 +8,4 @@ import androidx.room.OnConflictStrategy
 interface PlaylistTrackDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertPlaylistTrack(track: PlaylistTrackEntity)
-
-    // При необходимости можно добавить методы для удаления/получения треков
 }

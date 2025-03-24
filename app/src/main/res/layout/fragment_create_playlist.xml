@@ -7,9 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.playlistmaker.presentation.CreatePlaylistFragment">
-
-
-    <!-- Верхняя панель (MaterialToolbar) с заголовком и стрелкой "Назад" -->
+    
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
@@ -26,8 +24,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:title="Новый плейлист" />
 
-
-    <!-- Контейнер для обложки с пунктирной обводкой -->
     <FrameLayout
         android:id="@+id/coverContainer"
         android:layout_width="0dp"
@@ -109,7 +105,6 @@
             android:textColor="@color/text_color"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Кнопка «Создать» (скруглённая) -->
     <Button
         android:id="@+id/createButton"
         android:layout_width="0dp"
