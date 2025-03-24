@@ -2,6 +2,7 @@ package com.example.playlistmaker.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.domain.interactor.PlaylistInteractor
 import com.example.playlistmaker.domain.interactors.FavoritesInteractor
 import com.example.playlistmaker.domain.models.Track
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,9 +33,10 @@ class FavoritesViewModel(private val interactor: FavoritesInteractor) : ViewMode
             }
         }
     }
-
-class PlaylistViewModel : ViewModel() {
-    // Логика для экрана Плейлистов
+class PlaylistViewModel(
+    private val playlistInteractor: PlaylistInteractor
+) : ViewModel() {
+    val playlistsFlow = playlistInteractor.observeAllPlaylists()
 }
 
 class LibraryViewModel : ViewModel() {

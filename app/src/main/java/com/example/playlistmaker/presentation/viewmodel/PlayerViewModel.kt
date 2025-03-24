@@ -8,8 +8,42 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import android.util.Log
+import com.example.playlistmaker.domain.interactor.PlaylistInteractor
+import com.example.playlistmaker.domain.models.Playlist
+import com.example.playlistmaker.domain.models.Track
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
-class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewModel() {
+class PlayerViewModel(
+    private val playerInteractor: PlayerInteractor,
+    private val playlistInteractor: PlaylistInteractor
+) : ViewModel() {
+
+    private val _playlistsFlow = MutableStateFlow<List<Playlist>>(emptyList())
+    val playlistsFlow = _playlistsFlow.asStateFlow()
+
+    fun loadPlaylists() {
+        viewModelScope.launch {
+            playlistInteractor.observeAllPlaylists().collect { loaded ->
+                _playlistsFlow.value = loaded
+            }
+        }
+    }
+
+    fun addTrackToPlaylist(track: Track, playlist: Playlist, onResult: (String) -> Unit) {
+        viewModelScope.launch {
+            val isAdded = playlistInteractor.addTrackToPlaylist(
+                playlist.id,
+                track
+            )
+            val message = if (isAdded) {
+                "Добавлено в плейлист ${playlist.name}"
+            } else {
+                "Трек уже добавлен в плейлист ${playlist.name}"
+            }
+            onResult(message)
+        }
+    }
 
     private val _isPlaying = MutableLiveData<Boolean>()
     val isPlaying: LiveData<Boolean> get() = _isPlaying
@@ -20,14 +54,18 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewMode
     private var updateTimeJob: Job? = null
 
     fun preparePlayer(url: String) {
-        playerInteractor.preparePlayer(url, onPrepared = {
-            _isPlaying.postValue(false)
-            _currentTime.postValue("00:00")
-        }, onCompletion = {
-            _isPlaying.postValue(false)
-            _currentTime.postValue("00:00")
-            updateTimeJob?.cancel() // Останавливаем обновление времени при завершении воспроизведения
-        })
+        playerInteractor.preparePlayer(
+            url,
+            onPrepared = {
+                _isPlaying.postValue(false)
+                _currentTime.postValue("00:00")
+            },
+            onCompletion = {
+                _isPlaying.postValue(false)
+                _currentTime.postValue("00:00")
+                updateTimeJob?.cancel()
+            }
+        )
     }
 
     fun togglePlayback() {
@@ -47,9 +85,9 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewMode
     private fun startUpdatingTime() {
         updateTimeJob?.cancel()
         updateTimeJob = viewModelScope.launch {
-            while (isActive && (_isPlaying.value ?: false)) {
+            while (isActive && (_isPlaying.value == true)) {
                 val currentPosition = playerInteractor.getCurrentPosition().toLong()
-                _currentTime.value = formatTrackTime(currentPosition)
+                _currentTime.postValue(formatTrackTime(currentPosition))
                 delay(300L)
             }
         }

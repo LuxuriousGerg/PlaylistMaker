@@ -1,25 +1,34 @@
 package com.example.playlistmaker.presentation.ui.player
 
 import PlayerViewModel
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.models.Track
-import com.example.playlistmaker.presentation.viewmodel.FavoritesViewModel
+import com.example.playlistmaker.presentation.ui.main.MainActivity
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.launchIn
 
 // Функция-расширение для установки обработчика кликов с debounce
 fun View.setDebouncedOnClickListener(
@@ -38,6 +47,7 @@ fun View.setDebouncedOnClickListener(
 }
 
 class PlayerActivity : AppCompatActivity() {
+
     private lateinit var trackTitle: TextView
     private lateinit var artistName: TextView
     private lateinit var playButton: ImageView
@@ -45,15 +55,14 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var backButton: ImageButton
     private lateinit var currentTimeTextView: TextView
 
-    // Кнопки для состояния "Нравится"
     private lateinit var likeButton: ImageView
     private lateinit var likePressedButton: ImageView
-    // Храним текущий трек
     private lateinit var currentTrack: Track
 
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+    private lateinit var bottomSheetAdapter: BottomSheetPlaylistAdapter
+
     private val playerViewModel: PlayerViewModel by viewModel()
-    // Внедряем FavoritesViewModel для работы с избранным
-    private val favoritesViewModel: FavoritesViewModel by viewModel()
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,11 +72,25 @@ class PlayerActivity : AppCompatActivity() {
         setupUI()
         setupObservers()
 
-        // Инициализируем кнопки "Нравится"
         likeButton = findViewById(R.id.like)
         likePressedButton = findViewById(R.id.like_pressed)
 
-        // Получаем трек из intent
+        val overlay = findViewById<View>(R.id.overlay)
+        val bottomSheetContainer = findViewById<LinearLayout>(R.id.playlists_bottom_sheet)
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                overlay.visibility = if (newState == BottomSheetBehavior.STATE_HIDDEN) View.GONE else View.VISIBLE
+            }
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                overlay.alpha = ((slideOffset + 1) / 2).coerceIn(0f, 1f)
+            }
+        })
+
+        // Получаем трек из интента и инициализируем UI
         val track = intent.getParcelableExtra("track", Track::class.java)
         track?.let {
             currentTrack = it
@@ -76,28 +99,60 @@ class PlayerActivity : AppCompatActivity() {
             it.previewUrl?.let { url ->
                 playerViewModel.preparePlayer(url)
             }
-
             Glide.with(this)
                 .load(it.getCoverArtwork())
                 .placeholder(R.drawable.placeholder_image)
                 .into(findViewById(R.id.album_cover))
-
             findViewById<TextView>(R.id.info_album_value).text = it.collectionName ?: "Unknown Album"
             findViewById<TextView>(R.id.info_year_value).text = it.getReleaseYear()
             findViewById<TextView>(R.id.info_genre_value).text = it.primaryGenreName ?: "Unknown Genre"
             findViewById<TextView>(R.id.info_country_value).text = it.country ?: "Unknown Country"
             findViewById<TextView>(R.id.info_duration_value).text = it.formatTrackTime(it.trackTimeMillis)
-
-            // Устанавливаем начальное состояние кнопки "Нравится"
             updateFavoriteButton()
         }
 
-        // Назначаем обработчики кликов для обеих кнопок (выбранное и не выбранное состояние)
         likeButton.setOnClickListener { toggleFavorite() }
         likePressedButton.setOnClickListener { toggleFavorite() }
+
+        // Кнопка для показа Bottom Sheet с плейлистами
+        findViewById<ImageView>(R.id.add_button).setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            playerViewModel.loadPlaylists()
+            playerViewModel.playlistsFlow
+                .onEach { bottomSheetAdapter.setPlaylists(it) }
+                .launchIn(lifecycleScope)
+        }
+
+        findViewById<Button>(R.id.button_new_playlist).setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java).apply {
+                putExtra("open_create_playlist", true)
+            }
+            startActivity(intent)
+            finish()
+        }
+
+        // Инициализация RecyclerView внутри Bottom Sheet
+        val bottomSheetRecyclerView = findViewById<RecyclerView>(R.id.rvPlaylistsBottomSheet)
+        bottomSheetRecyclerView.layoutManager = LinearLayoutManager(this)
+        bottomSheetAdapter = BottomSheetPlaylistAdapter { playlist ->
+            // При клике по элементу списка вызываем метод добавления трека в выбранный плейлист
+            playerViewModel.addTrackToPlaylist(currentTrack, playlist) { message ->
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                // Скрываем Bottom Sheet после обработки
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            }
+        }
+        bottomSheetRecyclerView.adapter = bottomSheetAdapter
+
+        val newPlaylistButton = findViewById<Button>(R.id.button_new_playlist)
+        newPlaylistButton.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("open_create_playlist", true)
+            startActivity(intent)
+            finish()
+        }
     }
 
-    // Обновляет видимость кнопок в зависимости от флага isFavorite
     private fun updateFavoriteButton() {
         if (currentTrack.isFavorite) {
             likeButton.visibility = View.GONE
@@ -108,10 +163,7 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    // Переключает состояние избранного для текущего трека
     private fun toggleFavorite() {
-        favoritesViewModel.toggleFavorite(currentTrack)
-        // Переключаем локальное состояние и обновляем UI
         currentTrack.isFavorite = !currentTrack.isFavorite
         updateFavoriteButton()
     }
@@ -128,36 +180,18 @@ class PlayerActivity : AppCompatActivity() {
         artistName.isSelected = true
         findViewById<TextView>(R.id.info_album_value).isSelected = true
 
-        backButton.setOnClickListener {
-            finish()
-        }
-        // Используем debounced обработчик кликов для переключения воспроизведения
-        playButton.setDebouncedOnClickListener(delayMs = 300L, coroutineScope = lifecycleScope) {
-            playerViewModel.togglePlayback()
-        }
-        pauseButton.setDebouncedOnClickListener(delayMs = 300L, coroutineScope = lifecycleScope) {
-            playerViewModel.togglePlayback()
-        }
+        backButton.setOnClickListener { finish() }
+
+        playButton.setDebouncedOnClickListener(300L, lifecycleScope) { playerViewModel.togglePlayback() }
+        pauseButton.setDebouncedOnClickListener(300L, lifecycleScope) { playerViewModel.togglePlayback() }
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun setupObservers() {
-        val track: Track? = intent.getParcelableExtra("track", Track::class.java)
-
-        track?.let {
-            trackTitle.text = it.trackName
-            artistName.text = it.artistName
-            Glide.with(this)
-                .load(it.getCoverArtwork())
-                .placeholder(R.drawable.placeholder_image)
-                .into(findViewById(R.id.album_cover))
-        }
-
         playerViewModel.isPlaying.observe(this) { isPlaying ->
             playButton.visibility = if (isPlaying) View.GONE else View.VISIBLE
             pauseButton.visibility = if (isPlaying) View.VISIBLE else View.GONE
         }
-
         playerViewModel.currentTime.observe(this) { time ->
             currentTimeTextView.text = time
         }
