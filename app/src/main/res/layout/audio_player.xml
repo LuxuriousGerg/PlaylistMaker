@@ -286,6 +286,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>
+
     <View
         android:id="@+id/overlay"
         android:layout_width="match_parent"
@@ -296,12 +297,19 @@
     <LinearLayout
         android:id="@+id/playlists_bottom_sheet"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:background="@drawable/bottom_sheet_bg"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:behavior_hideable="true"
         app:behavior_peekHeight="0dp">
+        <View
+            android:id="@+id/bottomSheetHandle"
+            android:layout_width="50dp"
+            android:layout_height="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/rounded_handle_bg" />
         <include layout="@layout/fragment_playlists_bottom_sheet" />
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

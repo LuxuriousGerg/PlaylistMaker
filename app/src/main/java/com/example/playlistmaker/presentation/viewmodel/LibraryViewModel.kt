@@ -11,33 +11,34 @@ import kotlinx.coroutines.launch
 
 class FavoritesViewModel(private val interactor: FavoritesInteractor) : ViewModel() {
 
-        private val _favoriteTracks = MutableStateFlow<List<Track>>(emptyList())
-        val favoriteTracks = _favoriteTracks.asStateFlow()
+    private val _favoriteTracks = MutableStateFlow<List<Track>>(emptyList())
+    val favoriteTracks = _favoriteTracks.asStateFlow()
 
-        fun loadFavorites() {
-            viewModelScope.launch {
-                interactor.getAllFavorites().collect { tracks ->
-                    _favoriteTracks.value = tracks
-                }
-            }
-        }
-
-        fun toggleFavorite(track: Track) {
-            viewModelScope.launch {
-                if (track.isFavorite) {
-                    interactor.removeTrack(track)
-                } else {
-                    interactor.addTrack(track)
-                }
-                loadFavorites()
+    fun loadFavorites() {
+        viewModelScope.launch {
+            interactor.getAllFavorites().collect { tracks ->
+                _favoriteTracks.value = tracks
             }
         }
     }
+
+    fun toggleFavorite(track: Track) {
+        viewModelScope.launch {
+            // Создаём новый экземпляр трека с инвертированным флагом isFavorite
+            val updatedTrack = track.copy(isFavorite = !track.isFavorite)
+            if (updatedTrack.isFavorite) {
+                interactor.addTrack(updatedTrack)
+            } else {
+                interactor.removeTrack(updatedTrack)
+            }
+            // Обновляем список избранных треков после изменения
+            loadFavorites()
+        }
+    }
+}
+
 class PlaylistViewModel(
     private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
     val playlistsFlow = playlistInteractor.observeAllPlaylists()
-}
-class LibraryViewModel : ViewModel() {
-    // Логика для экрана "Медиатека"
 }

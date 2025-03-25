@@ -102,7 +102,6 @@ class SearchViewModel(
         }
     }
 
-
     fun loadSearchHistory() {
         val json = sharedPreferences.getString(SEARCH_HISTORY_KEY, null)
         val historyList: List<Track> = if (!json.isNullOrEmpty()) {
@@ -117,20 +116,14 @@ class SearchViewModel(
     }
     fun addToSearchHistory(track: Track) {
         val updatedList = _searchHistory.value.toMutableList()
-        // Удаляем, если трек уже есть, чтобы не было дублей
         updatedList.remove(track)
-        // Добавляем в начало
         updatedList.add(0, track)
-        // Ограничиваем размер (например, 10)
         if (updatedList.size > 10) {
             updatedList.removeLast()
         }
-        // Сохраняем
         saveSearchHistory(updatedList)
         _searchHistory.value = updatedList
     }
-
-
 
     fun clearHistory() {
         saveSearchHistory(emptyList())

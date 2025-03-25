@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.TextView
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -20,7 +20,7 @@ class PlaylistFragment : Fragment() {
     private val viewModel by viewModel<PlaylistViewModel>()
 
     private lateinit var rvPlaylists: RecyclerView
-    private lateinit var tvEmpty: TextView
+    private lateinit var emptyContainer: LinearLayout
     private lateinit var adapter: PlaylistAdapter
 
     companion object {
@@ -41,7 +41,7 @@ class PlaylistFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         rvPlaylists = view.findViewById(R.id.rvPlaylists)
-        tvEmpty = view.findViewById(R.id.tvEmpty)
+        emptyContainer = view.findViewById(R.id.emptyContainer)
         val newPlaylistButton = view.findViewById<Button>(R.id.button_new_playlist)
 
         rvPlaylists.layoutManager = GridLayoutManager(requireContext(), 2)
@@ -51,19 +51,16 @@ class PlaylistFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.playlistsFlow.collect { playlistList ->
                 if (playlistList.isEmpty()) {
-                    // Пустой список → заглушка
+                    emptyContainer.visibility = View.VISIBLE
                     rvPlaylists.visibility = View.GONE
-                    tvEmpty.visibility = View.VISIBLE
                 } else {
-                    // Есть плейлисты → показываем список
+                    emptyContainer.visibility = View.GONE
                     rvPlaylists.visibility = View.VISIBLE
-                    tvEmpty.visibility = View.GONE
                     adapter.setPlaylists(playlistList)
                 }
             }
         }
 
-        // Переход к фрагменту создания плейлиста
         newPlaylistButton.setOnClickListener {
             findNavController().navigate(R.id.createPlaylistFragment)
         }

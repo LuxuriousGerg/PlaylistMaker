@@ -11,7 +11,6 @@ import com.example.playlistmaker.domain.interactor.PlaylistInteractor
 import com.example.playlistmaker.domain.interactors.*
 import com.example.playlistmaker.domain.repository.*
 import com.example.playlistmaker.presentation.CreatePlaylistViewModel
-import com.example.playlistmaker.presentation.viewmodel.LibraryViewModel
 import com.example.playlistmaker.presentation.viewmodel.PlaylistViewModel
 import com.example.playlistmaker.presentation.viewmodel.SettingsViewModel
 import com.google.gson.Gson
@@ -83,16 +82,11 @@ val domainModule: Module = module {
     factory { PlaylistInteractor(androidContext(), get()) }
 }
 
-val viewModelModule: Module = module {
-    viewModel { PlayerViewModel(get(), get()) }
+val viewModelModule = module {
+    viewModel { PlayerViewModel(get(), get(), get()) }
     viewModel { SearchViewModel(get(), get(), get()) }
     viewModel { SettingsViewModel(get()) }
     viewModel { PlaylistViewModel(get()) }
-}
-
-// Модуль для экрана «Медиатека»
-val libraryModule = module {
-    viewModel { LibraryViewModel() }
 }
 
 // Модуль для экрана «Создание плейлиста»

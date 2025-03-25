@@ -27,7 +27,11 @@ class CreatePlaylistFragment : Fragment() {
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            binding.plusIcon.setImageURI(it)
+            binding.coverImageView.setImageURI(it)
+            binding.coverImageView.visibility = View.VISIBLE
+
+            binding.plusIcon.visibility = View.GONE
+
             viewModel.coverUri = it
             viewModel.hasUnsavedData = true
         }

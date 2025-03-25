@@ -9,6 +9,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import android.util.Log
 import com.example.playlistmaker.domain.interactor.PlaylistInteractor
+import com.example.playlistmaker.domain.interactors.FavoritesInteractor
 import com.example.playlistmaker.domain.models.Playlist
 import com.example.playlistmaker.domain.models.Track
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +17,8 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class PlayerViewModel(
     private val playerInteractor: PlayerInteractor,
-    private val playlistInteractor: PlaylistInteractor
+    private val playlistInteractor: PlaylistInteractor,
+    private val favoritesInteractor: FavoritesInteractor
 ) : ViewModel() {
 
     private val _playlistsFlow = MutableStateFlow<List<Playlist>>(emptyList())
@@ -30,20 +32,22 @@ class PlayerViewModel(
         }
     }
 
-    fun addTrackToPlaylist(track: Track, playlist: Playlist, onResult: (String) -> Unit) {
+    fun addTrackToPlaylist(
+        track: Track,
+        playlist: Playlist,
+        onResult: (message: String, added: Boolean) -> Unit
+    ) {
         viewModelScope.launch {
-            val isAdded = playlistInteractor.addTrackToPlaylist(
-                playlist.id,
-                track
-            )
+            val isAdded = playlistInteractor.addTrackToPlaylist(playlist.id, track)
             val message = if (isAdded) {
                 "Добавлено в плейлист ${playlist.name}"
             } else {
                 "Трек уже добавлен в плейлист ${playlist.name}"
             }
-            onResult(message)
+            onResult(message, isAdded)
         }
     }
+
 
     private val _isPlaying = MutableLiveData<Boolean>()
     val isPlaying: LiveData<Boolean> get() = _isPlaying
@@ -104,5 +108,15 @@ class PlayerViewModel(
         val minutes = totalSeconds / 60
         val seconds = totalSeconds % 60
         return String.format("%02d:%02d", minutes, seconds)
+    }
+
+    fun updateFavorite(track: Track) {
+        viewModelScope.launch {
+            if (track.isFavorite) {
+                favoritesInteractor.addTrack(track)
+            } else {
+                favoritesInteractor.removeTrack(track)
+            }
+        }
     }
 }

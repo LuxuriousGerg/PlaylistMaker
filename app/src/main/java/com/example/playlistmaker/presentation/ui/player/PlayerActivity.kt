@@ -12,7 +12,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,12 +24,11 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.launchIn
 
-// Функция-расширение для установки обработчика кликов с debounce
 fun View.setDebouncedOnClickListener(
     delayMs: Long = 300L,
     coroutineScope: CoroutineScope,
@@ -64,7 +62,6 @@ class PlayerActivity : AppCompatActivity() {
 
     private val playerViewModel: PlayerViewModel by viewModel()
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.audio_player)
@@ -77,31 +74,45 @@ class PlayerActivity : AppCompatActivity() {
 
         val overlay = findViewById<View>(R.id.overlay)
         val bottomSheetContainer = findViewById<LinearLayout>(R.id.playlists_bottom_sheet)
+
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetContainer).apply {
+            val screenHeight = resources.displayMetrics.heightPixels
+            val twoThirds = (screenHeight * 0.66).toInt()
+            peekHeight = twoThirds
+
             state = BottomSheetBehavior.STATE_HIDDEN
+
+            addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    overlay.visibility =
+                        if (newState == BottomSheetBehavior.STATE_HIDDEN) View.GONE
+                        else View.VISIBLE
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                    overlay.alpha = ((slideOffset + 1) / 2).coerceIn(0f, 1f)
+                }
+            })
         }
 
-        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                overlay.visibility = if (newState == BottomSheetBehavior.STATE_HIDDEN) View.GONE else View.VISIBLE
-            }
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                overlay.alpha = ((slideOffset + 1) / 2).coerceIn(0f, 1f)
-            }
-        })
+        val track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra("track", Track::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra("track") as? Track
+        }
 
-        val track = intent.getParcelableExtra("track", Track::class.java)
         track?.let {
             currentTrack = it
             trackTitle.text = it.trackName
             artistName.text = it.artistName
-            it.previewUrl?.let { url ->
-                playerViewModel.preparePlayer(url)
-            }
+            it.previewUrl?.let { url -> playerViewModel.preparePlayer(url) }
+
             Glide.with(this)
                 .load(it.getCoverArtwork())
                 .placeholder(R.drawable.placeholder_image)
                 .into(findViewById(R.id.album_cover))
+
             findViewById<TextView>(R.id.info_album_value).text = it.collectionName ?: "Unknown Album"
             findViewById<TextView>(R.id.info_year_value).text = it.getReleaseYear()
             findViewById<TextView>(R.id.info_genre_value).text = it.primaryGenreName ?: "Unknown Genre"
@@ -113,37 +124,32 @@ class PlayerActivity : AppCompatActivity() {
         likeButton.setOnClickListener { toggleFavorite() }
         likePressedButton.setOnClickListener { toggleFavorite() }
 
-        // Кнопка для показа Bottom Sheet с плейлистами
+        val bottomSheetRecyclerView = findViewById<RecyclerView>(R.id.rvPlaylistsBottomSheet)
+        bottomSheetRecyclerView.layoutManager = LinearLayoutManager(this)
+        bottomSheetAdapter = BottomSheetPlaylistAdapter { playlist ->
+            playerViewModel.addTrackToPlaylist(currentTrack, playlist) { message, added ->
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                if (added) {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                }
+            }
+        }
+        bottomSheetRecyclerView.adapter = bottomSheetAdapter
+
         findViewById<ImageView>(R.id.add_button).setOnClickListener {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
             playerViewModel.loadPlaylists()
             playerViewModel.playlistsFlow
                 .onEach { bottomSheetAdapter.setPlaylists(it) }
                 .launchIn(lifecycleScope)
         }
 
-        findViewById<Button>(R.id.button_new_playlist).setOnClickListener {
+        val newPlaylistButton = findViewById<Button>(R.id.button_new_playlist)
+        newPlaylistButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java).apply {
                 putExtra("open_create_playlist", true)
             }
-            startActivity(intent)
-            finish()
-        }
-
-        val bottomSheetRecyclerView = findViewById<RecyclerView>(R.id.rvPlaylistsBottomSheet)
-        bottomSheetRecyclerView.layoutManager = LinearLayoutManager(this)
-        bottomSheetAdapter = BottomSheetPlaylistAdapter { playlist ->
-            playerViewModel.addTrackToPlaylist(currentTrack, playlist) { message ->
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            }
-        }
-        bottomSheetRecyclerView.adapter = bottomSheetAdapter
-
-        val newPlaylistButton = findViewById<Button>(R.id.button_new_playlist)
-        newPlaylistButton.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra("open_create_playlist", true)
             startActivity(intent)
             finish()
         }
@@ -162,6 +168,8 @@ class PlayerActivity : AppCompatActivity() {
     private fun toggleFavorite() {
         currentTrack.isFavorite = !currentTrack.isFavorite
         updateFavoriteButton()
+
+        playerViewModel.updateFavorite(currentTrack)
     }
 
     private fun setupUI() {
@@ -182,7 +190,6 @@ class PlayerActivity : AppCompatActivity() {
         pauseButton.setDebouncedOnClickListener(300L, lifecycleScope) { playerViewModel.togglePlayback() }
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun setupObservers() {
         playerViewModel.isPlaying.observe(this) { isPlaying ->
             playButton.visibility = if (isPlaying) View.GONE else View.VISIBLE
