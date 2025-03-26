@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/backgroundPrimary">
 
-    <!-- Список избранных треков -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/favoritesRecyclerView"
         android:layout_width="0dp"
@@ -40,6 +39,5 @@
             android:textSize="@dimen/text_normal"
             android:textColor="@color/buttonText2"/>
     </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

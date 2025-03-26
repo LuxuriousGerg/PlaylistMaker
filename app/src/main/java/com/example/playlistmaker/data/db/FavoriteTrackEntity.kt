@@ -17,7 +17,6 @@ data class FavoriteTrackEntity(
     val artworkUrl100: String,
     val previewUrl: String?,
 
-    // Поле для упорядочивания (когда трек добавлен в избранное)
     val addedAt: Long = System.currentTimeMillis()
 ) {
     fun toTrack(): Track {
@@ -49,7 +48,7 @@ data class FavoriteTrackEntity(
                 trackTimeMillis = track.trackTimeMillis,
                 artworkUrl100 = track.artworkUrl100 ?: "",
                 previewUrl = track.previewUrl,
-                addedAt = System.currentTimeMillis() // фиксируем момент добавления
+                addedAt = System.currentTimeMillis()
             )
         }
     }

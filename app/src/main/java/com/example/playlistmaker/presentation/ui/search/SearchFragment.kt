@@ -46,7 +46,7 @@ class SearchFragment : Fragment() {
                 return inflater.inflate(R.layout.fragment_search, container, false)
     }
 
-    // Здесь инициализируем все view, ставим слушатели, подписываемся на данные из VM
+    // инициализируем все view, ставим слушатели, подписываемся на данные из VM
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

@@ -1,7 +1,10 @@
 package com.example.playlistmaker.domain.models
 
+import android.os.Parcelable
 import java.io.Serializable
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class Track(
     val trackId: Long,          // ID
     val trackName: String,      // Название композиции
@@ -14,7 +17,7 @@ data class Track(
     val country: String,        // Страна
     val previewUrl: String?,
     var isFavorite: Boolean = false   // Флаг избранного
-) : Serializable {
+) : Parcelable {
 
     fun getReleaseYear(): String {
         return releaseDate.split("-")[0] // Извлекаем только год

@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.Dispatchers
-import retrofit2.HttpException
 import java.io.IOException
 
 class TrackRepositoryImpl(private val apiService: iTunesApiService) : TrackRepository {
@@ -16,19 +15,30 @@ class TrackRepositoryImpl(private val apiService: iTunesApiService) : TrackRepos
     override fun searchTracks(query: String): Flow<Result<List<Track>>> = flow {
         try {
             val response = apiService.searchTracks(query)
-            if (response.isSuccessful && response.body() != null) {
-                val tracks = response.body()?.results?.mapNotNull { mapToDomain(it) } ?: emptyList()
-                emit(Result.success(tracks))
-            } else {
+
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body == null) {
+                    emit(Result.success(emptyList()))
+                } else {
+                    val tracks = body.results?.mapNotNull { mapToDomain(it) } ?: emptyList()
+                    emit(Result.success(tracks))
+                }
+            }
+            else if (response.code() in listOf(400, 403, 404)) {
+                emit(Result.success(emptyList()))
+            }
+            else {
                 emit(Result.failure(IOException("Error: ${response.code()}")))
             }
-        } catch (e: HttpException) {
-            emit(Result.failure(IOException("Network error", e)))
+
         } catch (e: IOException) {
             emit(Result.failure(IOException("Check your internet connection", e)))
+
+        } catch (e: Exception) {
+            emit(Result.failure(IOException("Unknown error", e)))
         }
     }.flowOn(Dispatchers.IO)
-
 
     private fun mapToDomain(dto: TrackDTO): Track {
         return Track(

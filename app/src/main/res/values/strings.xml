@@ -32,4 +32,9 @@
     <string name="empty_favorites_text">Ваша медиатека пуста</string>
     <string name="favorites_tab_title">Избранные треки</string>
     <string name="playlists_tab_title">Плейлисты</string>
+    <string name="playlist_name">Название*</string>
+    <string name="playlist_description">Описание</string>
+    <string name="create_playlist">Создать</string>
+    <string name="new_playlist">Новый плейлист</string>
+    <string name="add_to_playlist">Добавить в плейлист</string>
 </resources>

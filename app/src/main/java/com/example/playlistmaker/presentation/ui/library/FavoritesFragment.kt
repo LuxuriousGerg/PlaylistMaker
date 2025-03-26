@@ -67,7 +67,6 @@ class FavoritesFragment : Fragment() {
                 }
             }
         }
-
         // Загружаем список избранных треков
         viewModel.loadFavorites()
     }
