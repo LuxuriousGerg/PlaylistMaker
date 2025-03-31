@@ -12,7 +12,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.models.Playlist
 import com.example.playlistmaker.presentation.viewmodel.PlaylistViewModel
+import kotlinx.coroutines.flow.collect
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistFragment : Fragment() {
@@ -21,12 +23,10 @@ class PlaylistFragment : Fragment() {
 
     private lateinit var rvPlaylists: RecyclerView
     private lateinit var emptyContainer: LinearLayout
-    private lateinit var adapter: PlaylistAdapter
+    private lateinit var playlistAdapter: PlaylistAdapter
 
     companion object {
-        fun newInstance(): PlaylistFragment {
-            return PlaylistFragment()
-        }
+        fun newInstance(): PlaylistFragment = PlaylistFragment()
     }
 
     override fun onCreateView(
@@ -45,8 +45,18 @@ class PlaylistFragment : Fragment() {
         val newPlaylistButton = view.findViewById<Button>(R.id.button_new_playlist)
 
         rvPlaylists.layoutManager = GridLayoutManager(requireContext(), 2)
-        adapter = PlaylistAdapter()
-        rvPlaylists.adapter = adapter
+
+        playlistAdapter = PlaylistAdapter { playlist ->
+            val bundle = Bundle().apply {
+                putLong("playlistId", playlist.id)
+            }
+            findNavController().navigate(
+                R.id.action_library_fragment_to_playlistInsideFragment,
+                bundle
+            )
+        }
+
+        rvPlaylists.adapter = playlistAdapter
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.playlistsFlow.collect { playlistList ->
@@ -56,7 +66,7 @@ class PlaylistFragment : Fragment() {
                 } else {
                     emptyContainer.visibility = View.GONE
                     rvPlaylists.visibility = View.VISIBLE
-                    adapter.setPlaylists(playlistList)
+                    playlistAdapter.setPlaylists(playlistList)
                 }
             }
         }

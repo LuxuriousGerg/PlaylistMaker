@@ -30,5 +30,15 @@ class PlaylistInteractor(
     suspend fun addTrackToPlaylist(playlistId: Long, track: Track): Boolean {
         return repository.addTrackToPlaylist(playlistId, track)
     }
-
+    suspend fun saveCoverAndUpdatePlaylist(
+        playlistId: Long,
+        newName: String,
+        newDescription: String,
+        newCoverUri: Uri?
+    ) {
+        val newCoverFilePath = newCoverUri?.let {
+            FileUtils.copyUriToInternalStorage(context, it)
+        }
+        repository.updatePlaylist(playlistId, newName, newDescription, newCoverFilePath)
+    }
 }

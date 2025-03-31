@@ -5,7 +5,7 @@ import androidx.lifecycle.*
 import com.example.playlistmaker.domain.interactor.PlaylistInteractor
 import kotlinx.coroutines.launch
 
-class CreatePlaylistViewModel(
+open class CreatePlaylistViewModel(
     private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
 
@@ -14,10 +14,10 @@ class CreatePlaylistViewModel(
     var coverUri: Uri? = null
     var hasUnsavedData: Boolean = false
 
-    private val _playlistCreatedEvent = MutableLiveData<String?>()
+    protected val _playlistCreatedEvent = MutableLiveData<String?>()
     val playlistCreatedEvent: LiveData<String?> = _playlistCreatedEvent
 
-    fun onCreatePlaylistClicked() {
+    open fun onCreatePlaylistClicked() {
         if (playlistName.isBlank()) return
         viewModelScope.launch {
             playlistInteractor.saveCoverAndCreatePlaylist(
@@ -25,6 +25,7 @@ class CreatePlaylistViewModel(
                 playlistDescription,
                 coverUri
             )
+
             _playlistCreatedEvent.value = playlistName
         }
     }

@@ -22,4 +22,5 @@
     <color name="disable">#AEAFB4</color>
     <color name="track_checked_light">#9FBBF3</color>
     <color name="handle">#FFFFFF</color>
+    <color name="playlist_background">#E6E8EB</color>
 </resources>

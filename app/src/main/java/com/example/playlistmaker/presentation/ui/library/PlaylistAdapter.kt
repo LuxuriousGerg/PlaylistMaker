@@ -10,7 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.models.Playlist
 
-class PlaylistAdapter : RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder>() {
+class PlaylistAdapter(
+    private val onPlaylistClick: (Playlist) -> Unit
+) : RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder>() {
 
     private val playlists = mutableListOf<Playlist>()
 
@@ -32,7 +34,7 @@ class PlaylistAdapter : RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder>
 
     override fun getItemCount(): Int = playlists.size
 
-    class PlaylistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class PlaylistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val coverImage: ImageView = itemView.findViewById(R.id.coverImage)
         private val playlistName: TextView = itemView.findViewById(R.id.playlistName)
         private val trackCount: TextView = itemView.findViewById(R.id.trackCount)
@@ -41,11 +43,14 @@ class PlaylistAdapter : RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder>
             playlistName.text = playlist.name
             trackCount.text = "${playlist.trackCount} треков"
 
-            // Если нет обложки - показываем заглушку
             if (playlist.coverUri.isNullOrEmpty()) {
-                coverImage.setImageResource(R.drawable.playlist_picture)
+                coverImage.setImageResource(R.drawable.placeholder_image)
             } else {
                 coverImage.setImageURI(Uri.parse(playlist.coverUri))
+            }
+
+            itemView.setOnClickListener {
+                onPlaylistClick(playlist)
             }
         }
     }

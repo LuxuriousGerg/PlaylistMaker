@@ -11,6 +11,8 @@ import com.example.playlistmaker.domain.interactor.PlaylistInteractor
 import com.example.playlistmaker.domain.interactors.*
 import com.example.playlistmaker.domain.repository.*
 import com.example.playlistmaker.presentation.CreatePlaylistViewModel
+import com.example.playlistmaker.presentation.EditPlaylistViewModel
+import com.example.playlistmaker.presentation.viewmodel.PlaylistInsideViewModel
 import com.example.playlistmaker.presentation.viewmodel.PlaylistViewModel
 import com.example.playlistmaker.presentation.viewmodel.SettingsViewModel
 import com.google.gson.Gson
@@ -26,7 +28,6 @@ val dataModule: Module = module {
     single { Gson() }
     factory { MediaPlayer() }
 
-    // Retrofit
     single<iTunesApiService> {
         Retrofit.Builder()
             .baseUrl("https://itunes.apple.com/")
@@ -35,18 +36,15 @@ val dataModule: Module = module {
             .create(iTunesApiService::class.java)
     }
 
-    // Репозитории
     single<TrackRepository> { TrackRepositoryImpl(get()) }
     single<SettingsRepository> { SettingsRepositoryImpl(get()) }
     single<HistoryRepository> { SearchHistory(get(), get()) }
     factory<PlayerRepository> { PlayerRepositoryImpl(get()) }
 
-    // SharedPreferences
     single {
         androidContext().getSharedPreferences("playlist_prefs", android.content.Context.MODE_PRIVATE)
     }
 
-    // Инициализация базы данных Room
     single {
         Room.databaseBuilder(
             androidContext(),
@@ -57,13 +55,10 @@ val dataModule: Module = module {
             .build()
     }
 
-    // DAO для плейлистов
     single { get<AppDatabase>().playlistDao() }
 
-    // DAO для треков в плейлистах (добавляемое)
     single { get<AppDatabase>().playlistTrackDao() }
 
-    // Репозиторий для плейлистов — теперь принимает 2 DAO
     single {
         PlaylistRepository(
             playlistDao = get(),
@@ -77,8 +72,6 @@ val domainModule: Module = module {
     factory<SettingsInteractor> { SettingsInteractorImpl(get()) }
     factory<HistoryInteractor> { HistoryInteractorImpl(get()) }
     factory<PlayerInteractor> { PlayerInteractorImpl(get()) }
-
-    // PlaylistInteractor требует Context и PlaylistRepository
     factory { PlaylistInteractor(androidContext(), get()) }
 }
 
@@ -87,12 +80,19 @@ val viewModelModule = module {
     viewModel { SearchViewModel(get(), get(), get()) }
     viewModel { SettingsViewModel(get()) }
     viewModel { PlaylistViewModel(get()) }
+    viewModel { PlaylistInsideViewModel(get()) }
+    viewModel { EditPlaylistViewModel(get()) }
 }
 
-// Модуль для экрана «Создание плейлиста»
 val createPlaylistModule = module {
     viewModel {
         CreatePlaylistViewModel(
+            playlistInteractor = get()
+        )
+    }
+
+    viewModel {
+        EditPlaylistViewModel(
             playlistInteractor = get()
         )
     }
