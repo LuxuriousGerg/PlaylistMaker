@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
@@ -20,7 +21,7 @@ class PlaylistTracksAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_track, parent, false) // <-- используем ваш layout с album_cover
+            .inflate(R.layout.item_track, parent, false)
         return TrackViewHolder(view)
     }
 
@@ -31,9 +32,11 @@ class PlaylistTracksAdapter(
     override fun getItemCount(): Int = tracks.size
 
     fun setTracks(newList: List<Track>) {
+        val diffCallback = TrackDiffCallback(tracks, newList)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
         tracks.clear()
         tracks.addAll(newList)
-        notifyDataSetChanged()
+        diffResult.dispatchUpdatesTo(this)
     }
 
     inner class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -44,11 +47,7 @@ class PlaylistTracksAdapter(
 
         fun bind(track: Track) {
             trackName.text = track.trackName
-
-            val totalSeconds = track.trackTimeMillis / 1000
-            val minutes = totalSeconds / 60
-            val seconds = totalSeconds % 60
-            val timeStr = String.format("%d:%02d", minutes, seconds)
+            val timeStr = track.trackTimeMillis.toTrackTimeString()
             artistAndTime.text = "${track.artistName} • $timeStr"
 
             if (track.artworkUrl100.isNullOrEmpty()) {
@@ -62,14 +61,34 @@ class PlaylistTracksAdapter(
 
             arrowIcon.visibility = View.VISIBLE
 
-            itemView.setOnClickListener {
-                onTrackClick(track)
-            }
-
+            itemView.setOnClickListener { onTrackClick(track) }
             itemView.setOnLongClickListener {
                 onTrackLongClick(track)
                 true
             }
         }
+    }
+}
+
+private fun Long.toTrackTimeString(): String {
+    val minutes = this / 60000
+    val seconds = (this / 1000) % 60
+    return "$minutes:%02d".format(seconds)
+}
+
+class TrackDiffCallback(
+    private val oldList: List<Track>,
+    private val newList: List<Track>
+) : DiffUtil.Callback() {
+    override fun getOldListSize(): Int = oldList.size
+
+    override fun getNewListSize(): Int = newList.size
+
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return oldList[oldItemPosition].trackId == newList[newItemPosition].trackId
+    }
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return oldList[oldItemPosition] == newList[newItemPosition]
     }
 }

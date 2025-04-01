@@ -107,7 +107,7 @@ class PlayerActivity : AppCompatActivity() {
             trackTitle.text = it.trackName
             artistName.text = it.artistName
             it.previewUrl?.let { url -> playerViewModel.preparePlayer(url) }
-
+            Log.d("PlayerActivity", "Cover URL: ${it.getCoverArtwork()}")
             Glide.with(this)
                 .load(it.getCoverArtwork())
                 .placeholder(R.drawable.placeholder_image)

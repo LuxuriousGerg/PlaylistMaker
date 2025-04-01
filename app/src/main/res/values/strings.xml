@@ -42,4 +42,6 @@
     <string name="delete_item">Удалить</string>
     <string name="edit_playlist">Редактировать</string>
     <string name="save_playlist">Сохранить</string>
+    <string name="playlist_info">%1$s мин • %2$d треков</string>
+    <string name="no_tracks_message">В этом плейлисте нет треков</string>
 </resources>
