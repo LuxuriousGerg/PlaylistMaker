@@ -2,45 +2,41 @@ package com.example.playlistmaker.presentation
 
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.playlistmaker.databinding.FragmentCreatePlaylistBinding
-import androidx.activity.result.contract.ActivityResultContracts
 import com.example.playlistmaker.R
+import com.example.playlistmaker.databinding.FragmentCreatePlaylistBinding
+import com.example.playlistmaker.domain.interactor.PlaylistInteractor
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class CreatePlaylistFragment : Fragment() {
 
-    private var _binding: FragmentCreatePlaylistBinding? = null
-    private val binding get() = _binding!!
+open class CreatePlaylistFragment : Fragment() {
 
-    private val viewModel by viewModel<CreatePlaylistViewModel>()
+    protected var _binding: FragmentCreatePlaylistBinding? = null
+    protected val binding get() = _binding!!
 
-    private val pickImageLauncher = registerForActivityResult(
+    protected val createViewModel by viewModel<CreatePlaylistViewModel>()
+
+    protected val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
             binding.coverImageView.setImageURI(it)
             binding.coverImageView.visibility = View.VISIBLE
-
             binding.plusIcon.visibility = View.GONE
 
-            viewModel.coverUri = it
-            viewModel.hasUnsavedData = true
+            createViewModel.coverUri = it
+            createViewModel.hasUnsavedData = true
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentCreatePlaylistBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -55,49 +51,38 @@ class CreatePlaylistFragment : Fragment() {
 
         binding.toolbar.title = getString(R.string.new_playlist)
 
-        // Поле «Название»
         binding.nameEditText.doOnTextChanged { text, _, _, _ ->
-            viewModel.playlistName = text.toString()
+            createViewModel.playlistName = text.toString()
             binding.createButton.isEnabled = !text.isNullOrEmpty()
-            viewModel.hasUnsavedData = !text.isNullOrEmpty()
+            createViewModel.hasUnsavedData = !text.isNullOrEmpty()
         }
 
-        // Поле «Описание»
         binding.descriptionEditText.doOnTextChanged { text, _, _, _ ->
-            viewModel.playlistDescription = text.toString()
+            createViewModel.playlistDescription = text.toString()
             if (!text.isNullOrEmpty()) {
-                viewModel.hasUnsavedData = true
+                createViewModel.hasUnsavedData = true
             }
         }
 
-        // Выбор обложки
         binding.coverContainer.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }
 
-        // Кнопка «Создать»
         binding.createButton.setOnClickListener {
-            viewModel.onCreatePlaylistClicked()
+            createViewModel.onCreatePlaylistClicked()
         }
 
-        // Обработчик кнопки «Назад» на тулбаре
         binding.toolbar.setNavigationOnClickListener {
             handleBackPress()
         }
 
-        // Наблюдаем за событием успешного создания
-        viewModel.playlistCreatedEvent.observe(viewLifecycleOwner) { playlistName ->
+        createViewModel.playlistCreatedEvent.observe(viewLifecycleOwner) { playlistName ->
             playlistName?.let {
-                Toast.makeText(
-                    requireContext(),
-                    "Плейлист $it создан",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(requireContext(), "Плейлист $it создан", Toast.LENGTH_SHORT).show()
                 findNavController().navigateUp()
             }
         }
 
-        // Переопределяем системный Back
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
@@ -108,11 +93,11 @@ class CreatePlaylistFragment : Fragment() {
         )
     }
 
-    private fun handleBackPress() {
-        if (viewModel.hasUnsavedData &&
-            (viewModel.playlistName.isNotBlank() ||
-                    viewModel.playlistDescription.isNotBlank() ||
-                    viewModel.coverUri != null)
+    protected fun handleBackPress() {
+        if (createViewModel.hasUnsavedData &&
+            (createViewModel.playlistName.isNotBlank() ||
+                    createViewModel.playlistDescription.isNotBlank() ||
+                    createViewModel.coverUri != null)
         ) {
             showDiscardDialog()
         } else {

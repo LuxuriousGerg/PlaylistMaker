@@ -11,10 +11,12 @@
         android:name="com.example.playlistmaker.presentation.ui.library.LibraryFragment"
         android:label="@string/library"
         tools:layout="@layout/fragment_library">
-
         <action
             android:id="@+id/action_library_fragment_to_createPlaylistFragment"
             app:destination="@id/createPlaylistFragment" />
+        <action
+            android:id="@+id/action_library_fragment_to_playlistInsideFragment"
+            app:destination="@id/playlistInsideFragment" />
     </fragment>
 
     <fragment
@@ -43,6 +45,35 @@
         android:id="@+id/createPlaylistFragment"
         android:name="com.example.playlistmaker.presentation.CreatePlaylistFragment"
         android:label="@string/new_playlist"
-        tools:layout="@layout/fragment_create_playlist" />
+        tools:layout="@layout/fragment_create_playlist">
+        <argument
+            android:name="playlistToEdit"
+            app:argType="com.example.playlistmaker.domain.models.Playlist"
+            android:defaultValue="@null" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/editPlaylistFragment"
+        android:name="com.example.playlistmaker.presentation.ui.library.EditPlaylistFragment"
+        android:label="@string/edit_playlist"
+        tools:layout="@layout/fragment_create_playlist">
+        <argument
+            android:name="playlist"
+            app:argType="com.example.playlistmaker.domain.models.Playlist"
+            android:defaultValue="@null" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/playlistInsideFragment"
+        android:name="com.example.playlistmaker.presentation.ui.library.PlaylistInsideFragment"
+        android:label="Playlist Detail"
+        tools:layout="@layout/fragment_playlist_inside">
+        <argument
+            android:name="playlistId"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_playlistInsideFragment_to_editPlaylistFragment"
+            app:destination="@id/editPlaylistFragment" />
+    </fragment>
 
 </navigation>

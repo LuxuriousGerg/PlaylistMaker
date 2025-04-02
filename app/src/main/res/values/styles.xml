@@ -81,6 +81,29 @@
         <item name="android:backgroundTint">@null</item>
         <item name="android:backgroundTintMode">src_over</item>
     </style>
+    <style name="RoundedImage2" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <style name="AlertDialogCustom" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="materialAlertDialogTitleTextStyle">@style/MyDialogTitleTextStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/MyDialogButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/MyDialogButtonStyle</item>
+    </style>
+
+    <style name="MyDialogTitleTextStyle" parent="@style/TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textColor">@color/text_color</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="MyDialogButtonStyle" parent="@style/Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/enable</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
 
 </resources>
 
